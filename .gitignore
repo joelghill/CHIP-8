@@ -37,3 +37,6 @@
 # Mac OSX
 *.plist
 *.dSYM
+
+# CMAKE
+build/

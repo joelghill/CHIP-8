@@ -39,6 +39,8 @@ CHIP8::CHIP8() {
 
 }
 
-void CHIP8::LoadRom(uint8_t *rom) {
-
+void CHIP8::LoadRom(vector<char> *rom) {
+    for (int i = 0; i < rom->size(); i++) {
+        this->memory[this->program_counter + i] = rom->at(i);
+    }
 }

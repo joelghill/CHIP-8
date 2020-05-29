@@ -12,6 +12,9 @@
 #define CHIP_8_H
 
 #include <iostream>
+#include <vector>
+
+using namespace std;
 
 class CHIP8
 {
@@ -30,7 +33,7 @@ public:
      *
      * @param rom Byte array containing rom data
      */
-    void LoadRom(uint8_t *rom);
+    void LoadRom(vector<char> *rom);
 
 private:
     // CHIP-8 VM has 4096 bytes of memory

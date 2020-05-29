@@ -1,7 +1,13 @@
-/*
-
-*/
-
+/**
+ * @file chip-8.hpp
+ * @author your name (you@domain.com)
+ * @brief
+ * @version 0.1
+ * @date 2020-05-28
+ *
+ * @copyright Copyright (c) 2020
+ *
+ */
 #ifndef CHIP_8_H
 #define CHIP_8_H
 
@@ -12,6 +18,7 @@ class CHIP8
 
 
 public:
+
     /**
      * @brief Construct a new CHIP8 object
      *
@@ -19,15 +26,14 @@ public:
     CHIP8();
 
     /**
-     * @brief
+     * @brief Loads a CHIP-8 Rom into the emulator memory
      *
-     * @param rom A Byte array contaiing the rom data
+     * @param rom Byte array containing rom data
      */
-    void load_rom(uint8_t *rom);
+    void LoadRom(uint8_t *rom);
 
 private:
     // CHIP-8 VM has 4096 bytes of memory
-    //
     uint8_t memory[4096];
 
     // The stack is an array of 16 16-bit values, used to store the address that the interpreter

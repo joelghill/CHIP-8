@@ -40,3 +40,4 @@
 
 # CMAKE
 build/
+roms/.DS_Store

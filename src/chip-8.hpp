@@ -35,6 +35,12 @@ public:
      */
     void LoadRom(vector<char> *rom);
 
+    /**
+     * @brief Begins emulation of CHIP-8
+     *
+     */
+    void Start();
+
 private:
     // CHIP-8 VM has 4096 bytes of memory
     uint8_t* memory;
@@ -66,6 +72,10 @@ private:
 
     // When the sound timer value is nonzero, a beeping sound is made.
     uint8_t sound_timer;
+
+    void ProcessCurrentFrame();
+
+    int ProcessOpCode(uint16_t op_code);
 };
 
 #endif

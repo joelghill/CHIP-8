@@ -34,11 +34,14 @@ public:
 
 private:
     // CHIP-8 VM has 4096 bytes of memory
-    uint8_t memory[4096];
+    uint8_t* memory;
 
     // The stack is an array of 16 16-bit values, used to store the address that the interpreter
     // should return to when finished with a subroutine. Chip-8 allows for up to 16 levels of nested subroutines.
-    uint16_t stack[16];
+    uint8_t* stack;
+
+    // 64x32-pixel monochrome display
+    uint8_t* display;
 
     // The current stack pointer
     int stack_pointer;

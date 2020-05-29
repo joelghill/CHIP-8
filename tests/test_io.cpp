@@ -11,9 +11,7 @@ void test_read_rom(string filename, int expectded_size)
   cout << "Loading " << filename << endl;
   vector<char>* rom_data = ReadRom(filename);
 
-  if (rom_data->size() != expectded_size) {
-    throw "Rom is not of expected size";
-  }
+  assert(rom_data->size() == expectded_size);
 }
 
 int main(int argc, char** argv)

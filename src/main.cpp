@@ -24,6 +24,7 @@ int main(int argc, char** argv){
     // Load supplied rom
     vector<char>* rom_data = ReadRom(string(argv[1]));
     chip_8->LoadRom(rom_data);
+    chip_8->Start();
 
     delete chip_8;
     return 0;

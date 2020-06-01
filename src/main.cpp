@@ -1,8 +1,9 @@
-#include "chip-8.hpp"
-#include "io.hpp"
 #include <iostream>
 #include <fstream>
 #include <string>
+
+#include "chip-8.hpp"
+#include "io.hpp"
 
 using namespace std;
 

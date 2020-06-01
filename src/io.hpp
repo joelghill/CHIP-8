@@ -1,3 +1,6 @@
+#ifndef IO_HPP
+#define IO_HPP
+
 /**
  * @file io.hpp
  * @author Joel Hill (joel.hiil.87@gmail.com)
@@ -17,3 +20,5 @@ using namespace std;
  * @return char* Byte array of the application to run in CHIP-8
  */
 vector<char>* ReadRom(string filename);
+
+#endif

@@ -1,24 +1,25 @@
 #include<exception>
 #include<string>
+#include "exceptions.hpp"
 
 using namespace std;
 
-class OperationNotImplementedException : public exception {
+OperationNotImplementedException::OperationNotImplementedException(string error) {
+    errorMessage = error;
+}
 
-public:
+const char * OperationNotImplementedException::what() const noexcept
+{
+    return errorMessage.c_str();
+}
 
-    // Construct with given error message:
-    OperationNotImplementedException(string error = "Functionality not yet implemented!") {
-        errorMessage = error;
-    }
 
-    // Provided for compatibility with std::exception.
-    const char * what() const noexcept
-    {
-        return errorMessage.c_str();
-    }
+// Construct with given error message:
+InvalidStackOperationException::InvalidStackOperationException(string error) {
+    errorMessage = error;
+}
 
-private:
-
-     std::string errorMessage;
-};
+// Provided for compatibility with std::exception.
+const char* InvalidStackOperationException::what() const noexcept {
+    return errorMessage.c_str();
+}

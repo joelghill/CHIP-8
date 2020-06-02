@@ -26,6 +26,9 @@ CHIP8_State::CHIP8_State(
     // Initialize program counter
     this->setProgramCounter(programCounter);
 
+    // Initialiize the index register
+    this->setIndexRegister(indexRegister);
+
     // Timers should be initialized to 0
     this->setDelayTimer(delayTimer);
     this->setSoundTimer(soundTimer);

@@ -39,7 +39,7 @@ int Execute00EE(CHIP8_State* state);
  *
  * @return The number of cycles needed to perform the operation
  */
-int Execute1NNN(CHIP8_State* state, uint8_t op_code);
+int Execute1NNN(CHIP8_State* state, uint16_t op_code);
 
 /**
  * @brief Executes the 0x2NNN op code on the chip state
@@ -50,7 +50,7 @@ int Execute1NNN(CHIP8_State* state, uint8_t op_code);
  *
  * @return The number of cycles needed to perform the operation
  */
-int Execute2NNN(CHIP8_State* state, uint8_t op_code);
+int Execute2NNN(CHIP8_State* state, uint16_t op_code);
 
 /**
  * @brief Executes the 0x3XNN op code on the chip state
@@ -62,7 +62,7 @@ int Execute2NNN(CHIP8_State* state, uint8_t op_code);
  *
  * @return The number of cycles needed to perform the operation
  */
-int Execute3XNN(CHIP8_State* state, uint8_t op_code);
+int Execute3XNN(CHIP8_State* state, uint16_t op_code);
 
 /**
  * @brief Executes the 0x4XNN op code on the chip state
@@ -73,7 +73,7 @@ int Execute3XNN(CHIP8_State* state, uint8_t op_code);
  *
  * @return The number of cycles needed to perform the operation
  */
-int Execute4XNN(CHIP8_State* state, uint8_t op_code);
+int Execute4XNN(CHIP8_State* state, uint16_t op_code);
 
 /**
  * @brief Executes the 0x5XY0 op code on the chip state
@@ -84,7 +84,7 @@ int Execute4XNN(CHIP8_State* state, uint8_t op_code);
  *
  * @return The number of cycles needed to perform the operation
  */
-int Execute5XY0(CHIP8_State* state, uint8_t op_code);
+int Execute5XY0(CHIP8_State* state, uint16_t op_code);
 
 /**
  * @brief Executes the 0x6XNN op code on the chip state
@@ -96,7 +96,7 @@ int Execute5XY0(CHIP8_State* state, uint8_t op_code);
  *
  * @return The number of cycles needed to perform the operation
  */
-int Execute6XNN(CHIP8_State* state, uint8_t op_code);
+int Execute6XNN(CHIP8_State* state, uint16_t op_code);
 
 /**
  * @brief Executes the 0x7XNN op code on the chip state
@@ -108,7 +108,7 @@ int Execute6XNN(CHIP8_State* state, uint8_t op_code);
  *
  * @return The number of cycles needed to perform the operation
  */
-int Execute7XNN(CHIP8_State* state, uint8_t op_code);
+int Execute7XNN(CHIP8_State* state, uint16_t op_code);
 
 /**
  * @brief Executes the 0x8XY0 op code on the chip state
@@ -120,7 +120,7 @@ int Execute7XNN(CHIP8_State* state, uint8_t op_code);
  *
  * @return The number of cycles needed to perform the operation
  */
-int Execute8XY0(CHIP8_State* state, uint8_t op_code);
+int Execute8XY0(CHIP8_State* state, uint16_t op_code);
 
 /**
  * @brief Executes the 0x8XY1 op code on the chip state
@@ -132,7 +132,7 @@ int Execute8XY0(CHIP8_State* state, uint8_t op_code);
  *
  * @return The number of cycles needed to perform the operation
  */
-int Execute8XY1(CHIP8_State* state, uint8_t op_code);
+int Execute8XY1(CHIP8_State* state, uint16_t op_code);
 
 /**
  * @brief Executes the 0x8XY2 op code on the chip state
@@ -144,7 +144,7 @@ int Execute8XY1(CHIP8_State* state, uint8_t op_code);
  *
  * @return The number of cycles needed to perform the operation
  */
-int Execute8XY2(CHIP8_State* state, uint8_t op_code);
+int Execute8XY2(CHIP8_State* state, uint16_t op_code);
 
 /**
  * @brief Executes the 0x8XY3 op code on the chip state
@@ -156,7 +156,7 @@ int Execute8XY2(CHIP8_State* state, uint8_t op_code);
  *
  * @return The number of cycles needed to perform the operation
  */
-int Execute8XY3(CHIP8_State* state, uint8_t op_code);
+int Execute8XY3(CHIP8_State* state, uint16_t op_code);
 
 /**
  * @brief Executes the 0x8XY4 op code on the chip state
@@ -169,7 +169,7 @@ int Execute8XY3(CHIP8_State* state, uint8_t op_code);
  *
  * @return The number of cycles needed to perform the operation
  */
-int Execute8XY4(CHIP8_State* state, uint8_t op_code);
+int Execute8XY4(CHIP8_State* state, uint16_t op_code);
 
 /**
  * @brief Executes the 0x8XY5 op code on the chip state
@@ -182,7 +182,7 @@ int Execute8XY4(CHIP8_State* state, uint8_t op_code);
  *
  * @return The number of cycles needed to perform the operation
  */
-int Execute8XY5(CHIP8_State* state, uint8_t op_code);
+int Execute8XY5(CHIP8_State* state, uint16_t op_code);
 
 /**
  * @brief Executes the 0x8XY6 op code on the chip state
@@ -194,7 +194,7 @@ int Execute8XY5(CHIP8_State* state, uint8_t op_code);
  *
  * @return The number of cycles needed to perform the operation
  */
-int Execute8XY6(CHIP8_State* state, uint8_t op_code);
+int Execute8XY6(CHIP8_State* state, uint16_t op_code);
 
 /**
  * @brief Executes the 0x8XY5 op code on the chip state
@@ -207,7 +207,7 @@ int Execute8XY6(CHIP8_State* state, uint8_t op_code);
  *
  * @return The number of cycles needed to perform the operation
  */
-int Execute8XY7(CHIP8_State* state, uint8_t op_code);
+int Execute8XY7(CHIP8_State* state, uint16_t op_code);
 
 /**
  * @brief Executes the 0x8XYE op code on the chip state
@@ -219,7 +219,7 @@ int Execute8XY7(CHIP8_State* state, uint8_t op_code);
  *
  * @return The number of cycles needed to perform the operation
  */
-int Execute8XYE(CHIP8_State* state, uint8_t op_code);
+int Execute8XYE(CHIP8_State* state, uint16_t op_code);
 
 /**
  * @brief Executes the 0x9XY0 op code on the chip state
@@ -232,7 +232,7 @@ int Execute8XYE(CHIP8_State* state, uint8_t op_code);
  *
  * @return The number of cycles needed to perform the operation
  */
-int Execute9XY0(CHIP8_State* state, uint8_t op_code);
+int Execute9XY0(CHIP8_State* state, uint16_t op_code);
 
 /**
  * @brief Executes the 0xANNN op code on the chip state
@@ -244,7 +244,7 @@ int Execute9XY0(CHIP8_State* state, uint8_t op_code);
  *
  * @return The number of cycles needed to perform the operation
  */
-int ExecuteANNN(CHIP8_State* state, uint8_t op_code);
+int ExecuteANNN(CHIP8_State* state, uint16_t op_code);
 
 /**
  * @brief Executes the 0xBNNN op code on the chip state
@@ -256,7 +256,7 @@ int ExecuteANNN(CHIP8_State* state, uint8_t op_code);
  *
  * @return The number of cycles needed to perform the operation
  */
-int ExecuteBNNN(CHIP8_State* state, uint8_t op_code);
+int ExecuteBNNN(CHIP8_State* state, uint16_t op_code);
 
 /**
  * @brief Executes the 0xCNNN op code on the chip state
@@ -268,6 +268,21 @@ int ExecuteBNNN(CHIP8_State* state, uint8_t op_code);
  *
  * @return The number of cycles needed to perform the operation
  */
-int ExecuteCNNN(CHIP8_State* state, uint8_t op_code);
+int ExecuteCNNN(CHIP8_State* state, uint16_t op_code);
+
+/**
+ * @brief Executes the 0xDXYN op code on the chip state
+ *
+ * 0xDXYN - Draws a sprite at coordinate (VX, VY) that has a width of 8 pixels and a height of N pixels.
+ * Each row of 8 pixels is read as bit-coded starting from memory location I;
+ * I value doesn’t change after the execution of this instruction. As described above, VF is set to 1 if any screen
+ *  pixels are flipped from set to unset when the sprite is drawn, and to 0 if that doesn’t happen
+ *
+ * @param state Current chip state
+ * @param op_code The op code to execute
+ *
+ * @return The number of cycles needed to perform the operation
+ */
+int ExecuteDXYN(CHIP8_State* state, uint16_t op_code);
 
 #endif

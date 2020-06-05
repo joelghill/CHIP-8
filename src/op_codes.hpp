@@ -4,6 +4,7 @@
 #include <iostream>
 #include <sstream>
 #include "chip-8_state.hpp"
+#include "input/input_interface.hpp"
 
 static int DEFAULT_OP_CYCLES = 1;
 static uint8_t REGISTER_VF = 15;
@@ -284,5 +285,151 @@ int ExecuteCNNN(CHIP8_State* state, uint16_t op_code);
  * @return The number of cycles needed to perform the operation
  */
 int ExecuteDXYN(CHIP8_State* state, uint16_t op_code);
+
+/**
+ * @brief Executes the 0xEX9E op code on the chip state
+ *
+ * 0xEX9E -Skips the next instruction if the key stored in VX is pressed.
+ * (Usually the next instruction is a jump to skip a code block).
+ *
+ * @param state Current chip state
+ * @param op_code The op code to execute
+ * @param input The input interface used to retrieve info on what keys are pressed
+ *
+ * @return The number of cycles needed to perform the operation
+ */
+int ExecuteEX9E(CHIP8_State* state, uint16_t op_code, InputInterface* input);
+
+/**
+ * @brief Executes the 0xEXA1 op code on the chip state
+ *
+ * 0xEXA1 -Skips the next instruction if the key stored in VX isn't pressed.
+ * (Usually the next instruction is a jump to skip a code block).
+ *
+ * @param state Current chip state
+ * @param op_code The op code to execute
+ * @param input The input interface used to retrieve info on what keys are pressed
+ *
+ * @return The number of cycles needed to perform the operation
+ */
+int ExecuteEXA1(CHIP8_State* state, uint16_t op_code, InputInterface* input);
+
+/**
+ * @brief Executes the 0xFX07 op code on the chip state
+ *
+ * 0xFX07 -Sets VX to the value of the delay timer.
+ *
+ * @param state Current chip state
+ * @param op_code The op code to execute
+ *
+ * @return The number of cycles needed to perform the operation
+ */
+int ExecuteFX07(CHIP8_State* state, uint16_t op_code);
+
+/**
+ * @brief Executes the 0xFX0A op code on the chip state
+ *
+ * 0xFX0A - A key press is awaited, and then stored in VX.
+ * (Blocking Operation. All instruction halted until next key event)
+ *
+ * @param state Current chip state
+ * @param op_code The op code to execute
+ *
+ * @return The number of cycles needed to perform the operation
+ */
+int ExecuteFX0A(CHIP8_State* state, uint16_t op_code, InputInterface* input);
+
+/**
+ * @brief Executes the 0xFX15 op code on the chip state
+ *
+ * 0xFX15 - Sets the delay timer to VX.
+ *
+ * @param state Current chip state
+ * @param op_code The op code to execute
+ *
+ * @return The number of cycles needed to perform the operation
+ */
+int ExecuteFX15(CHIP8_State* state, uint16_t op_code);
+
+/**
+ * @brief Executes the 0xFX18 op code on the chip state
+ *
+ * 0xFX18 - Sets the sound timer to VX.
+ *
+ * @param state Current chip state
+ * @param op_code The op code to execute
+ *
+ * @return The number of cycles needed to perform the operation
+ */
+int ExecuteFX18(CHIP8_State* state, uint16_t op_code);
+
+/**
+ * @brief Executes the 0xFX1E op code on the chip state
+ *
+ * 0xFX1E - Adds VX to I.
+ * VF is set to 1 when there is a range overflow (I+VX>0xFFF), and to 0 when there isn't.
+ *
+ * @param state Current chip state
+ * @param op_code The op code to execute
+ *
+ * @return The number of cycles needed to perform the operation
+ */
+int ExecuteFX1E(CHIP8_State* state, uint16_t op_code);
+
+/**
+ * @brief Executes the 0xFX29 op code on the chip state
+ *
+ * 0xFX29 - Sets I to the location of the sprite for the character in VX.
+ * Characters 0-F (in hexadecimal) are represented by a 4x5 font.
+ *
+ * @param state Current chip state
+ * @param op_code The op code to execute
+ *
+ * @return The number of cycles needed to perform the operation
+ */
+int ExecuteFX29(CHIP8_State* state, uint16_t op_code);
+
+/**
+ * @brief Executes the 0xFX33 op code on the chip state
+ *
+ * 0xFX33 - Stores the binary-coded decimal representation of VX,
+ * with the most significant of three digits at the address in I,
+ * the middle digit at I plus 1, and the least significant digit at I plus 2.
+ * (In other words, take the decimal representation of VX,
+ * place the hundreds digit in memory at location in I,
+ * the tens digit at location I+1, and the ones digit at location I+2.)
+ *
+ * @param state Current chip state
+ * @param op_code The op code to execute
+ *
+ * @return The number of cycles needed to perform the operation
+ */
+int ExecuteFX33(CHIP8_State* state, uint16_t op_code);
+
+/**
+ * @brief Executes the 0xFX55 op code on the chip state
+ *
+ * 0xFX55 - Stores V0 to VX (including VX) in memory starting at address I.
+ * The offset from I is increased by 1 for each value written, but I itself is left unmodified.
+ *
+ * @param state Current chip state
+ * @param op_code The op code to execute
+ *
+ * @return The number of cycles needed to perform the operation
+ */
+int ExecuteFX55(CHIP8_State* state, uint16_t op_code);
+
+/**
+ * @brief Executes the 0xFX65 op code on the chip state
+ *
+ * 0xFX65 - Fills V0 to VX (including VX) with values from memory starting at address I.
+ * The offset from I is increased by 1 for each value written, but I itself is left unmodified.
+ *
+ * @param state Current chip state
+ * @param op_code The op code to execute
+ *
+ * @return The number of cycles needed to perform the operation
+ */
+int ExecuteFX65(CHIP8_State* state, uint16_t op_code);
 
 #endif

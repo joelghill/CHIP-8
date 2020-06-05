@@ -16,11 +16,15 @@
 #include "chip-8_state.hpp"
 #include "exceptions.hpp"
 #include "op_codes.hpp"
+#include "input/input_interface.hpp"
 
 using namespace std;
 using std::chrono::system_clock;
 
-CHIP8::CHIP8(CHIP8_State* state){
+CHIP8::CHIP8(InputInterface* input, CHIP8_State* state){
+
+    // Set the input instance
+    this->input_ = input;
 
     // Set to provided state, or instantiate own if none provided
     if (state == NULL) {
@@ -206,6 +210,77 @@ int CHIP8::ProcessOpCode(uint16_t op_code) {
                 // CXNN - Sets VX to the result of a bitwise and operation on a random number and NN
                 // (Typically: 0 to 255)
                 return ExecuteCNNN(this->state_, op_code);
+            }
+
+            case 0x0D: {
+                // DXYN - Draws a sprite at coordinate (VX, VY) that has a width of 8 pixels and a height of N pixels.
+                return ExecuteDXYN(this->state_, op_code);
+            }
+
+            case 0x0E: {
+                // There are two op codes we are concerned about  when the first nibble is 0x0E
+                uint8_t e_op_code = op_code & 0x00FF;
+                if (e_op_code == 0x9E) {
+                    // EX9E - Skips the next instruction if the key stored in VX is pressed.
+                    // (Usually the next instruction is a jump to skip a code block)
+                    return ExecuteEX9E(this->state_, op_code, this->input_);
+                }
+                else if (e_op_code == 0xA1) {
+                    // EXA1 - Skips the next instruction if the key stored in VX isn't pressed.
+                    // (Usually the next instruction is a jump to skip a code block)
+                    return ExecuteEXA1(this->state_, op_code, this->input_);
+                }
+                else {
+                    stringstream error_string;
+                    error_string << "Op Code " << op_code << " has not yet been implemented." << endl;
+                    throw OperationNotImplementedException(error_string.str());
+                }
+            }
+
+            case 0x0F: {
+                // There are two op codes we are concerned about  when the first nibble is 0x0E
+                uint8_t f_op_code = op_code & 0x00FF;
+
+                switch(f_op_code) {
+                    case 0x07: {
+                        // 0xFX07 -Sets VX to the value of the delay timer.
+                        return ExecuteFX07(this->state_, op_code);
+                    }
+                    case 0x0A: {
+                        // 0xFX0A - A key press is awaited, and then stored in VX.
+                        return ExecuteFX0A(this->state_, op_code, this->input_);
+                    }
+                    case 0x15: {
+                        // 0xFX15 - Sets the delay timer to VX
+                        return ExecuteFX15(this->state_, op_code);
+                    }
+                    case 0x18: {
+                        // 0xFX18 - Sets the sound timer to VX.
+                        return ExecuteFX18(this->state_, op_code);
+                    }
+                    case 0x1E: {
+                        // 0xFX1E - Adds VX to I.
+                        // VF is set to 1 when there is a range overflow (I+VX>0xFFF), and to 0 when there isn't.
+                        return ExecuteFX1E(this->state_, op_code);
+                    }
+                    case 0x29: {
+                        // 0xFX29 - Sets I to the location of the sprite for the character in VX.
+                        return ExecuteFX29(this->state_, op_code);
+                    }
+                    case 0x33: {
+                        // 0xFX33 - Stores the binary-coded decimal representation of VX,
+                        // with the most significant of three digits at the address in I
+                        return ExecuteFX33(this->state_, op_code);
+                    }
+                    case 0x55: {
+                        // 0xFX55 - Stores V0 to VX (including VX) in memory starting at address I.
+                        return ExecuteFX55(this->state_, op_code);
+                    }
+                    case 0x65: {
+                        // 0xFX65 - Fills V0 to VX (including VX) with values from memory starting at address I.
+                        return ExecuteFX65(this->state_, op_code);
+                    }
+                }
             }
         }
 

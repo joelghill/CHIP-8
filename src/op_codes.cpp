@@ -13,6 +13,7 @@
 #include "chip-8_state.hpp"
 #include "exceptions.hpp"
 #include "op_codes.hpp"
+#include "input/input_interface.hpp"
 
 int Execute00E0(CHIP8_State* state) {
     for (int i=0; i < (DISPLAY_HEIGHT * DISPLAY_WIDTH); i++) {

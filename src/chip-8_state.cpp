@@ -75,7 +75,7 @@ uint16_t CHIP8_State::popStack() {
     // Get 16 bit address from top of stack then decrement pointer
     // Stack is array of bytes, so 16 bit address is grabbed in two parts
     uint16_t ms_address = (uint16_t)this->stack_[this->stackPointer_];
-    uint16_t ls_address = (uint16_t)this->stack_[this->stackPointer_];
+    uint16_t ls_address = (uint16_t)this->stack_[this->stackPointer_ + 1];
     this->stackPointer_ -= 2;
 
     uint16_t address = (ms_address << 8) | ls_address;
@@ -108,6 +108,10 @@ uint16_t CHIP8_State::programCounter() {
 
 void CHIP8_State::setProgramCounter(uint16_t value) {
     this->programCounter_ = value;
+}
+
+void CHIP8_State::incrementProgramCounter(int value) {
+    this->programCounter_ += value;
 }
 
 uint8_t CHIP8_State::delayTimer() {

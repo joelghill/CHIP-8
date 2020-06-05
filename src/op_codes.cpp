@@ -10,6 +10,7 @@
  */
 #include <iostream>
 #include <sstream>
+#include <math.h>
 #include "chip-8_state.hpp"
 #include "exceptions.hpp"
 #include "op_codes.hpp"
@@ -341,6 +342,139 @@ int ExecuteDXYN(CHIP8_State* state, uint16_t op_code) {
     }
     else {
         state->setVRegister(15, 0);
+    }
+
+    return DEFAULT_OP_CYCLES;
+}
+
+int ExecuteEX9E(CHIP8_State* state, uint16_t op_code, InputInterface* input) {
+    uint8_t vx_index = (uint8_t)(op_code & 0x0F00) >> 8;
+    uint8_t vx = state->vRegister(vx_index);
+
+    if (input->isPressed(vx) == true) {
+        // Skip next instruction by jumping PC ahead by 16 bits
+        state->incrementProgramCounter(2);
+    }
+
+    return DEFAULT_OP_CYCLES;
+}
+
+int ExecuteEXA1(CHIP8_State* state, uint16_t op_code, InputInterface* input) {
+    uint8_t vx_index = (uint8_t)(op_code & 0x0F00) >> 8;
+    uint8_t vx = state->vRegister(vx_index);
+
+    if (input->isPressed(vx) == false) {
+        // Skip next instruction by jumping PC ahead by 16 bits
+        state->incrementProgramCounter(2);
+    }
+
+    return DEFAULT_OP_CYCLES;
+}
+
+int ExecuteFX07(CHIP8_State* state, uint16_t op_code) {
+    uint8_t vx_index = (uint8_t)(op_code & 0x0F00) >> 8;
+    uint8_t delay_timer = state->delayTimer();
+
+    state->setVRegister(vx_index, delay_timer);
+
+    return DEFAULT_OP_CYCLES;
+}
+
+int ExecuteFX0A(CHIP8_State* state, uint16_t op_code, InputInterface* input) {
+    uint8_t vx_index = (uint8_t)(op_code & 0x0F00) >> 8;
+    uint8_t key = input->getInput();
+
+    state->setVRegister(vx_index, key);
+
+    return BLOCKING_CALL;
+}
+
+int ExecuteFX15(CHIP8_State* state, uint16_t op_code) {
+    uint8_t vx_index = (uint8_t)(op_code & 0x0F00) >> 8;
+    uint8_t vx = state->vRegister(vx_index);
+
+    state->setDelayTimer(vx);
+
+    return DEFAULT_OP_CYCLES;
+}
+
+int ExecuteFX18(CHIP8_State* state, uint16_t op_code) {
+    uint8_t vx_index = (uint8_t)(op_code & 0x0F00) >> 8;
+    uint8_t vx = state->vRegister(vx_index);
+
+    state->setSoundTimer(vx);
+
+    return DEFAULT_OP_CYCLES;
+}
+
+int ExecuteFX1E(CHIP8_State* state, uint16_t op_code) {
+    uint8_t vx_index = (uint8_t)(op_code & 0x0F00) >> 8;
+    uint8_t vx = state->vRegister(vx_index);
+
+    uint8_t index_register = state->indexRegister();
+
+    uint16_t new_index_register = index_register + vx;
+    state->setIndexRegister(new_index_register);
+
+    if (new_index_register > 0xFFF) {
+        state->setVRegister(0x0F, 1);
+    }
+    else {
+        state->setVRegister(0x0F, 0);
+    }
+
+    return DEFAULT_OP_CYCLES;
+}
+
+int ExecuteFX29(CHIP8_State* state, uint16_t op_code) {
+    uint8_t vx_index = (uint8_t)(op_code & 0x0F00) >> 8;
+    uint8_t vx = state->vRegister(vx_index);
+    uint16_t font_location = FONT_MEMORY_LOCATION + vx;
+
+    state->setIndexRegister(font_location);
+
+    return DEFAULT_OP_CYCLES;
+}
+
+int8_t _GetDecimalDigit(int8_t integer, uint8_t n) {
+    return (int8_t)((integer % (uint8_t)pow(10, n))/pow(10, n-1));
+}
+
+int ExecuteFX33(CHIP8_State* state, uint16_t op_code) {
+    uint8_t vx_index = (uint8_t)(op_code & 0x0F00) >> 8;
+    uint8_t vx = state->vRegister(vx_index);
+
+    uint8_t most_sig = _GetDecimalDigit(vx, 3);
+    uint8_t middle_sig = _GetDecimalDigit(vx, 2);
+    uint8_t least_sig = _GetDecimalDigit(vx, 1);
+
+    uint16_t index_register_address = state->indexRegister();
+    state->setMemoryValue(index_register_address, most_sig);
+    state->setMemoryValue(index_register_address + 1, middle_sig);
+    state->setMemoryValue(index_register_address + 2, least_sig);
+
+    return DEFAULT_OP_CYCLES;
+}
+
+int ExecuteFX55(CHIP8_State* state, uint16_t op_code) {
+    uint8_t vx_index = (uint8_t)(op_code & 0x0F00) >> 8;
+    uint16_t index_register_address = state->indexRegister();
+
+    for (uint8_t i = 0; i <= vx_index; i++) {
+        uint8_t v_value = state->vRegister(i);
+        state->setMemoryValue(index_register_address + i, v_value);
+    }
+
+    return DEFAULT_OP_CYCLES;
+}
+
+int ExecuteFX65(CHIP8_State* state, uint16_t op_code) {
+    uint8_t vx_index = (uint8_t)(op_code & 0x0F00) >> 8;
+    uint16_t index_register_address = state->indexRegister();
+
+    for (uint8_t i = 0; i <= vx_index; i++) {
+        uint8_t v_value = state->memoryValue(index_register_address + i);
+        state->setVRegister(i, v_value);
     }
 
     return DEFAULT_OP_CYCLES;

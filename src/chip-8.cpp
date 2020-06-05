@@ -65,6 +65,17 @@ void CHIP8::Start() {
 }
 
 int CHIP8::ProcessCurrentFrame() {
+    // Update timers
+    uint8_t delay_time = this->state_->delayTimer();
+    if (delay_time > 0) {
+        this->state_->setDelayTimer(delay_time - 1);
+    }
+
+    uint8_t sound_time = this->state_->soundTimer();
+    if (sound_time > 0) {
+        this->state_->setSoundTimer(sound_time - 1);
+    }
+
      // Get current PC
     uint16_t current_pc = this->state_->programCounter();
 
@@ -75,11 +86,11 @@ int CHIP8::ProcessCurrentFrame() {
     // Use bit shift and bitwise operator to combine into single op code
     uint16_t op_code = ((uint16_t)ms_op_code << 8) | ls_op_code;
 
-    // Move program counter forward 16 bits
-    this->state_->setProgramCounter(current_pc + 2);
-
     // Process the op code and return the number of CPU cycles used to process op code
     return this->ProcessOpCode(op_code);
+
+    // Move program counter forward 16 bits
+    this->state_->setProgramCounter(current_pc + 2);
 }
 
 int CHIP8::ProcessOpCode(uint16_t op_code) {

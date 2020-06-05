@@ -7,6 +7,7 @@
 #include "input/input_interface.hpp"
 
 static int DEFAULT_OP_CYCLES = 1;
+static int BLOCKING_CALL = -1;
 static uint8_t REGISTER_VF = 15;
 
 /**

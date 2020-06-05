@@ -18,9 +18,12 @@ using namespace std;
 
 static int V_REGISTER_COUNT = 16;
 static int RAM_SIZE = 4096;
+
 static uint8_t INITAL_PROGRAM_COUNTER = (uint8_t)0x200;
 static uint8_t DISPLAY_MEMORY_LOCATION = (uint8_t)0xF00;
 static uint8_t STACK_MEMORY_LOCATION = (uint8_t)0xEA0;
+static uint8_t FONT_MEMORY_LOCATION = (uint8_t)0x000;
+
 static int DISPLAY_WIDTH = 64;
 static int DISPLAY_HEIGHT = 32;
 static int SPRITE_WIDTH = 8;
@@ -147,6 +150,13 @@ public:
      * @param value The new PC
      */
     void setProgramCounter(uint16_t value);
+
+    /**
+     * @brief Increments the program counter by the provided integer
+     *
+     * @param value A positive or negative integer
+     */
+    void incrementProgramCounter(int value);
 
     /**
      * @brief Gets the current value of the delay timer

@@ -4,6 +4,8 @@
 
 #include "chip-8.hpp"
 #include "io.hpp"
+#include "input/input_factory.hpp"
+#include "input/mock_input.hpp"
 
 using namespace std;
 
@@ -20,7 +22,9 @@ int main(int argc, char** argv){
         return -1;
     }
 
-    CHIP8* chip_8 = new CHIP8();
+    InputInterface* input = new MockInput();
+
+    CHIP8* chip_8 = new CHIP8(input);
 
     // Load supplied rom
     vector<char>* rom_data = ReadRom(string(argv[1]));

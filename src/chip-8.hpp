@@ -15,6 +15,7 @@
 #include <vector>
 #include "chip-8_state.hpp"
 #include "input/input_interface.hpp"
+#include "display/display_interface.hpp"
 
 using namespace std;
 
@@ -29,7 +30,7 @@ public:
      * @param input Interface to a device input object
      * @param state (optional) The begining state of the CHIP-8 emulator
      */
-    CHIP8(InputInterface* input, CHIP8_State* state=NULL);
+    CHIP8(DisplayInterface* display, InputInterface* input, CHIP8_State* state=NULL);
 
     /**
      * @brief Loads a CHIP-8 Rom into the emulator memory
@@ -60,6 +61,12 @@ public:
     int ProcessOpCode(uint16_t op_code);
 
 private:
+
+    /**
+     * @brief Reference to the interface to the emulator display
+     *
+     */
+    DisplayInterface* display_;
 
     /**
      * @brief Reference to the interface used to retrieve hardware input

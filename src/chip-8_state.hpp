@@ -24,10 +24,6 @@ static uint8_t DISPLAY_MEMORY_LOCATION = (uint8_t)0xF00;
 static uint8_t STACK_MEMORY_LOCATION = (uint8_t)0xEA0;
 static uint8_t FONT_MEMORY_LOCATION = (uint8_t)0x000;
 
-static int DISPLAY_WIDTH = 64;
-static int DISPLAY_HEIGHT = 32;
-static int SPRITE_WIDTH = 8;
-
 class CHIP8_State
 {
 
@@ -61,7 +57,8 @@ private:
     uint8_t* stack_;
 
     // 64x32-pixel monochrome display
-    uint8_t* display_;
+    // Represented as an array of bool arrays
+    bool display_[64][32];
 
     // The current stack pointer
     int16_t stackPointer_ = -2;
@@ -83,6 +80,26 @@ private:
 
     // When the sound timer value is nonzero, a beeping sound is made.
     uint8_t soundTimer_;
+
+    // Hard coded definition of CHIP-8 font set
+    uint8_t fontset_[80] = {
+        0xF0, 0x90, 0x90, 0x90, 0xF0, // 0
+        0x20, 0x60, 0x20, 0x20, 0x70, // 1
+        0xF0, 0x10, 0xF0, 0x80, 0xF0, // 2
+        0xF0, 0x10, 0xF0, 0x10, 0xF0, // 3
+        0x90, 0x90, 0xF0, 0x10, 0x10, // 4
+        0xF0, 0x80, 0xF0, 0x10, 0xF0, // 5
+        0xF0, 0x80, 0xF0, 0x90, 0xF0, // 6
+        0xF0, 0x10, 0x20, 0x40, 0x40, // 7
+        0xF0, 0x90, 0xF0, 0x90, 0xF0, // 8
+        0xF0, 0x90, 0xF0, 0x10, 0xF0, // 9
+        0xF0, 0x90, 0xF0, 0x90, 0x90, // A
+        0xE0, 0x90, 0xE0, 0x90, 0xE0, // B
+        0xF0, 0x80, 0x80, 0x80, 0xF0, // C
+        0xE0, 0x90, 0x90, 0x90, 0xE0, // D
+        0xF0, 0x80, 0xF0, 0x80, 0xF0, // E
+        0xF0, 0x80, 0xF0, 0x80, 0x80  // F
+    };
 
 public:
 
@@ -208,7 +225,7 @@ public:
      * @param index The index of the display byte
      * @return uint8_t The value stored in the display memory at the specified index
      */
-    uint8_t displayValue(uint16_t index);
+    bool displayValue(int x, int y);
 
     /**
      * @brief Sets the byte in the display memory at the provided location
@@ -216,7 +233,7 @@ public:
      * @param index The index of the byte to set
      * @param value The value to set in the display memory
      */
-    void setDisplayValue(uint16_t index, uint8_t value);
+    void setDisplayValue(int x, int y, bool value);
 };
 
 #endif

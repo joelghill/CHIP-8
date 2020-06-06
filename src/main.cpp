@@ -6,6 +6,7 @@
 #include "io.hpp"
 #include "input/input_factory.hpp"
 #include "input/mock_input.hpp"
+#include "display/terminal_display.hpp"
 
 using namespace std;
 
@@ -22,9 +23,10 @@ int main(int argc, char** argv){
         return -1;
     }
 
+    TerminalDisplay* display = new TerminalDisplay();
     InputInterface* input = new MockInput();
 
-    CHIP8* chip_8 = new CHIP8(input);
+    CHIP8* chip_8 = new CHIP8(display, input);
 
     // Load supplied rom
     vector<char>* rom_data = ReadRom(string(argv[1]));

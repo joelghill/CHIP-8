@@ -1,7 +1,10 @@
 include_directories(. ../src)
+find_package(Curses REQUIRED)
+include_directories(${CURSES_INCLUDE_DIR})
 
 add_executable(test_io test_io.cpp ../src/io.cpp)
-add_executable(test_set_display test_set_display.cpp ../src/chip-8_state.cpp ../src/op_codes.cpp ../src/exceptions.cpp)
+add_executable(test_set_display test_set_display.cpp ../src/chip-8_state.cpp ../src/op_codes.cpp ../src/exceptions.cpp ../src/display/terminal_display.cpp)
+target_link_libraries(test_set_display ${CURSES_LIBRARIES})
 
 
 add_test(NAME test_io COMMAND test_io WORKING_DIRECTORY ${UNIT_TEST_BIN_OUTPUT_DIR})

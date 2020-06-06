@@ -47,12 +47,15 @@ CHIP8_State::CHIP8_State(
         this->memory_ = memory;
     }
 
-    // The uppermost 256 bytes (0xF00-0xFFF) are reserved for display refresh
-    this->display_ = &this->memory_[DISPLAY_MEMORY_LOCATION];
-
     // The 96 bytes below the display are reserved for the call stack
     // 0xEA0-0xEFF
    this->stack_ = &(this->memory_[STACK_MEMORY_LOCATION]);
+
+    // Load the font set into the first 80 bytes of memory
+    for (uint8_t character_index = 0; character_index < 5; character_index++) {
+        uint8_t character_address = character_index + FONT_MEMORY_LOCATION;
+        this->memory_[character_address] = this->fontset_[character_index];
+    }
 }
 
 void CHIP8_State::pushStack(uint16_t address) {
@@ -138,10 +141,10 @@ void CHIP8_State::setMemoryValue(uint16_t index, uint8_t value) {
     this->memory_[index] = value;
 }
 
-uint8_t CHIP8_State::displayValue(uint16_t index) {
-    return this->display_[index];
+bool CHIP8_State::displayValue(int x, int y ) {
+    return this->display_[x][y];
 }
 
-void CHIP8_State::setDisplayValue(uint16_t index, uint8_t value) {
-    this->display_[index] = value;
+void CHIP8_State::setDisplayValue(int x, int y, bool value) {
+    this->display_[x][y] = value;
 }

@@ -21,7 +21,9 @@
 using namespace std;
 using std::chrono::system_clock;
 
-CHIP8::CHIP8(InputInterface* input, CHIP8_State* state){
+CHIP8::CHIP8(DisplayInterface* display, InputInterface* input, CHIP8_State* state) {
+    // Set the display interface
+    this->display_ = display;
 
     // Set the input instance
     this->input_ = input;
@@ -91,6 +93,9 @@ int CHIP8::ProcessCurrentFrame() {
 
     // Move program counter forward 16 bits
     this->state_->setProgramCounter(current_pc + 2);
+
+    // After everthing has been processed, update the display
+    this->display_->updateDisplay(this->state_);
 }
 
 int CHIP8::ProcessOpCode(uint16_t op_code) {

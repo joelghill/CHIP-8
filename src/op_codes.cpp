@@ -15,10 +15,13 @@
 #include "exceptions.hpp"
 #include "op_codes.hpp"
 #include "input/input_interface.hpp"
+#include "display/display_interface.hpp"
 
 int Execute00E0(CHIP8_State* state) {
-    for (int i=0; i < (DISPLAY_HEIGHT * DISPLAY_WIDTH); i++) {
-        state->setDisplayValue(i, 0x00);
+    for (int j = 0; j < DISPLAY_HEIGHT; j++) {
+        for (int i = 0; i < DISPLAY_WIDTH; i++) {
+            state->setDisplayValue(i, j, false);
+        }
     }
 
     return DEFAULT_OP_CYCLES;
@@ -302,6 +305,7 @@ int ExecuteDXYN(CHIP8_State* state, uint16_t op_code) {
     bool changed_bit = false;
     uint16_t index_register = state->indexRegister();
 
+    // For each row defining the sprite in data
     for (int row_index = 0; row_index < sprite_height; row_index++) {
         // Get the row of pixels
         uint8_t row_data = state->memoryValue(index_register + row_index);
@@ -311,12 +315,10 @@ int ExecuteDXYN(CHIP8_State* state, uint16_t op_code) {
             //Get the bit we want to check if it's set:
             bool sprite_bit = (row_data & (0b10000000 >> pixel_index)) > 0;
 
-            uint16_t bit_index = (DISPLAY_WIDTH * (vy + row_index)) + (vx + pixel_index);
-            uint16_t byte_index = (bit_index / 8);
-            uint16_t bit_offset = (bit_index % 8);
+            int display_pixel_y = vy + row_index;
+            int display_pixel_x =  vx + pixel_index;
 
-            uint8_t display_byte = state->displayValue(byte_index);
-            bool display_bit = (display_byte & (0b10000000 >> bit_offset)) > 0;
+            bool display_bit = state->displayValue(display_pixel_x, display_pixel_y);
 
             // If the display bit will change and the display bit is being cleared
             if ((display_bit != sprite_bit) && display_bit == true) {
@@ -327,13 +329,11 @@ int ExecuteDXYN(CHIP8_State* state, uint16_t op_code) {
             // If we're setting the bit
             if (sprite_bit == true) {
                 // Set the bit based on the pixel offset
-                display_byte = (display_byte | (0b10000000 >> bit_offset));
+                state->setDisplayValue(display_pixel_x, display_pixel_y, true);
             } else {
                 // Clear the bit based on the pixel offset
-                display_byte = (display_byte & (~(0b10000000 >> bit_offset)));
+                state->setDisplayValue(display_pixel_x, display_pixel_y, false);
             }
-
-            state->setDisplayValue(byte_index, display_byte);
         }
     }
 

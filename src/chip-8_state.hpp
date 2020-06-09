@@ -12,17 +12,16 @@
 #define CHIP_8_STATE_H
 
 #include <iostream>
-#include <vector>
 
 using namespace std;
 
 static int V_REGISTER_COUNT = 16;
 static int RAM_SIZE = 4096;
 
-static uint8_t INITAL_PROGRAM_COUNTER = (uint8_t)0x200;
-static uint8_t DISPLAY_MEMORY_LOCATION = (uint8_t)0xF00;
-static uint8_t STACK_MEMORY_LOCATION = (uint8_t)0xEA0;
-static uint8_t FONT_MEMORY_LOCATION = (uint8_t)0x000;
+static uint16_t INITAL_PROGRAM_COUNTER = 0x200;
+static uint16_t DISPLAY_MEMORY_LOCATION = 0xF00;
+static uint16_t STACK_MEMORY_LOCATION = 0xEA0;
+static uint16_t FONT_MEMORY_LOCATION = 0x000;
 
 class CHIP8_State
 {
@@ -116,6 +115,13 @@ public:
      * @return uint8_t The memory address that was stored on top of the stack
      */
     uint16_t popStack();
+
+    /**
+     * @brief Reads the current top value in the stack without modifying the stack
+     *
+     * @return uint16_t The current stack value
+     */
+    uint16_t peekStack();
 
     /**
      * @brief The index of the current stack pointer

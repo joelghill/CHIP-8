@@ -199,7 +199,7 @@ int Execute8XY5(CHIP8_State* state, uint16_t op_code);
 int Execute8XY6(CHIP8_State* state, uint16_t op_code);
 
 /**
- * @brief Executes the 0x8XY5 op code on the chip state
+ * @brief Executes the 0x8XY7 op code on the chip state
  *
  * 0x8XY7 - VX is set to VY subtracted from VX.
  * VF is set to 0 when there's a borrow, and 1 when there isn't.

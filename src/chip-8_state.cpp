@@ -85,6 +85,21 @@ uint16_t CHIP8_State::popStack() {
     return address;
 }
 
+uint16_t CHIP8_State::peekStack() {
+    // If the stack is empty prevent pop
+    if (this->stackPointer_ < 0) {
+        throw InvalidStackOperationException("Stack is empty");
+    }
+
+    // Get 16 bit address from top of stack then decrement pointer
+    // Stack is array of bytes, so 16 bit address is grabbed in two parts
+    uint16_t ms_address = (uint16_t)this->stack_[this->stackPointer_];
+    uint16_t ls_address = (uint16_t)this->stack_[this->stackPointer_ + 1];
+
+    uint16_t address = (ms_address << 8) | ls_address;
+    return address;
+}
+
 int16_t CHIP8_State::stackPointer() {
     return this->stackPointer_;
 }

@@ -10,12 +10,21 @@
  */
 #include <iostream>
 #include <sstream>
+#include <string>
 #include <math.h>
 #include "chip-8_state.hpp"
 #include "exceptions.hpp"
 #include "op_codes.hpp"
 #include "input/input_interface.hpp"
 #include "display/display_interface.hpp"
+
+uint8_t _getVxIndex(uint16_t op_code) {
+    return (uint8_t)((op_code & 0x0F00) >> 8);
+}
+
+uint8_t _getVyIndex(uint16_t op_code) {
+    return (uint8_t)((op_code & 0x00F0) >> 4);
+}
 
 int Execute00E0(CHIP8_State* state) {
     for (int j = 0; j < DISPLAY_HEIGHT; j++) {
@@ -57,7 +66,7 @@ int Execute2NNN(CHIP8_State* state, uint16_t op_code) {
 
 int Execute3XNN(CHIP8_State* state, uint16_t op_code) {
 
-    uint8_t vx_index = (uint8_t)(op_code & 0x0F00) >> 8;
+    uint8_t vx_index = _getVxIndex(op_code);
     uint8_t vx = state->vRegister(vx_index);
     uint8_t nn = (uint8_t)(op_code & 0x00FF);
     if (vx == nn) {
@@ -69,7 +78,7 @@ int Execute3XNN(CHIP8_State* state, uint16_t op_code) {
 
 int Execute4XNN(CHIP8_State* state, uint16_t op_code) {
 
-    uint8_t vx_index = (uint8_t)(op_code & 0x0F00) >> 8;
+    uint8_t vx_index = _getVxIndex(op_code);
     uint8_t vx = state->vRegister(vx_index);
     uint8_t nn = (uint8_t)(op_code & 0x00FF);
     if (vx != nn) {
@@ -81,8 +90,8 @@ int Execute4XNN(CHIP8_State* state, uint16_t op_code) {
 
 int Execute5XY0(CHIP8_State* state, uint16_t op_code) {
 
-    uint8_t vx_index = (uint8_t)(op_code & 0x0F00) >> 8;
-    uint8_t vy_index = (uint8_t)(op_code & 0x00F0) >> 4;
+    uint8_t vx_index = _getVxIndex(op_code);
+    uint8_t vy_index = _getVyIndex(op_code);
 
     uint8_t vx = state->vRegister(vx_index);
     uint8_t vy = state->vRegister(vy_index);
@@ -95,7 +104,7 @@ int Execute5XY0(CHIP8_State* state, uint16_t op_code) {
 
 int Execute6XNN(CHIP8_State* state, uint16_t op_code) {
 
-    uint8_t vx_index = (uint8_t)(op_code & 0x0F00) >> 8;
+    uint8_t vx_index = _getVxIndex(op_code);
     uint8_t nn = (uint8_t)(op_code & 0x00FF);
     state->setVRegister(vx_index, nn);
 
@@ -105,7 +114,7 @@ int Execute6XNN(CHIP8_State* state, uint16_t op_code) {
 int Execute7XNN(CHIP8_State* state, uint16_t op_code) {
 
     uint8_t nn = (uint8_t)(op_code & 0x00FF);
-    uint8_t vx_index = (uint8_t)(op_code & 0x0F00) >> 8;
+    uint8_t vx_index = _getVxIndex(op_code);
     uint8_t vx = state->vRegister(vx_index) + nn;
 
     state->setVRegister(vx_index, vx);
@@ -115,8 +124,8 @@ int Execute7XNN(CHIP8_State* state, uint16_t op_code) {
 
 int Execute8XY0(CHIP8_State* state, uint16_t op_code) {
 
-    uint8_t vx_index = (uint8_t)(op_code & 0x0F00) >> 8;
-    uint8_t vy_index = (uint8_t)(op_code & 0x00f0) >> 4;
+    uint8_t vx_index = _getVxIndex(op_code);
+    uint8_t vy_index = _getVyIndex(op_code);
     uint8_t vy = state->vRegister(vy_index);
 
     state->setVRegister(vx_index, vy);
@@ -126,10 +135,10 @@ int Execute8XY0(CHIP8_State* state, uint16_t op_code) {
 
 int Execute8XY1(CHIP8_State* state, uint16_t op_code) {
 
-    uint8_t vx_index = (uint8_t)(op_code & 0x0F00) >> 8;
+    uint8_t vx_index = _getVxIndex(op_code);
     uint8_t vx = state->vRegister(vx_index);
 
-    uint8_t vy_index = (uint8_t)(op_code & 0x00f0) >> 4;
+    uint8_t vy_index = _getVyIndex(op_code);
     uint8_t vy = state->vRegister(vy_index);
 
     state->setVRegister(vx_index, (vx | vy));
@@ -139,10 +148,10 @@ int Execute8XY1(CHIP8_State* state, uint16_t op_code) {
 
 int Execute8XY2(CHIP8_State* state, uint16_t op_code) {
 
-    uint8_t vx_index = (uint8_t)(op_code & 0x0F00) >> 8;
+    uint8_t vx_index = _getVxIndex(op_code);
     uint8_t vx = state->vRegister(vx_index);
 
-    uint8_t vy_index = (uint8_t)(op_code & 0x00f0) >> 4;
+    uint8_t vy_index = _getVyIndex(op_code);
     uint8_t vy = state->vRegister(vy_index);
 
     state->setVRegister(vx_index, (vx & vy));
@@ -152,10 +161,10 @@ int Execute8XY2(CHIP8_State* state, uint16_t op_code) {
 
 int Execute8XY3(CHIP8_State* state, uint16_t op_code) {
 
-    uint8_t vx_index = (uint8_t)(op_code & 0x0F00) >> 8;
+    uint8_t vx_index = _getVxIndex(op_code);
     uint8_t vx = state->vRegister(vx_index);
 
-    uint8_t vy_index = (uint8_t)(op_code & 0x00f0) >> 4;
+    uint8_t vy_index = _getVyIndex(op_code);
     uint8_t vy = state->vRegister(vy_index);
 
     state->setVRegister(vx_index, (vx ^ vy));
@@ -164,10 +173,10 @@ int Execute8XY3(CHIP8_State* state, uint16_t op_code) {
 }
 
 int Execute8XY4(CHIP8_State* state, uint16_t op_code) {
-    uint8_t vx_index = (uint8_t)(op_code & 0x0F00) >> 8;
+    uint8_t vx_index = _getVxIndex(op_code);
     uint8_t vx = state->vRegister(vx_index);
 
-    uint8_t vy_index = (uint8_t)(op_code & 0x00f0) >> 4;
+    uint8_t vy_index = _getVyIndex(op_code);
     uint8_t vy = state->vRegister(vy_index);
 
     // Add and save into 16bit to catch carry
@@ -187,50 +196,54 @@ int Execute8XY4(CHIP8_State* state, uint16_t op_code) {
 }
 
 int Execute8XY5(CHIP8_State* state, uint16_t op_code) {
-    uint8_t vx_index = (uint8_t)(op_code & 0x0F00) >> 8;
+    uint8_t vx_index = _getVxIndex(op_code);
     uint8_t vx = state->vRegister(vx_index);
 
-    uint8_t vy_index = (uint8_t)(op_code & 0x00f0) >> 4;
+    uint8_t vy_index = _getVyIndex(op_code);
     uint8_t vy = state->vRegister(vy_index);
 
-    // Add and save into 16bit to catch carry
-    uint16_t difference = vx - vy;
+    // Subtract and save into 16bit to catch carry
+    uint8_t difference = vx - vy;
 
-    // Set VF register to 1 or 0 based on result
-    if (difference < 0) {
-        state->setVRegister(REGISTER_VF, 0);
-    } else {
+    // Save result as 8bits
+    state->setVRegister(vx_index, (uint8_t)difference);
+
+    // Set VF register to 1 or 0
+    if (difference > vx) {
+        // There was a borrow, set VF
         state->setVRegister(REGISTER_VF, 1);
+    } else {
+        state->setVRegister(REGISTER_VF, 0);
     }
 
     return DEFAULT_OP_CYCLES;
 }
 
 int Execute8XY6(CHIP8_State* state, uint16_t op_code) {
-    uint8_t vx_index = (uint8_t)(op_code & 0x0F00) >> 8;
+    uint8_t vx_index = _getVxIndex(op_code);
     uint8_t vx = state->vRegister(vx_index);
 
-    state->setVRegister(REGISTER_VF, vx & 0b1000'0000);
-    state->setVRegister(vx_index, vx << 1);
+    state->setVRegister(REGISTER_VF, vx & 0b0000'0001);
+    state->setVRegister(vx_index, uint8_t(vx >> 1));
 
     return DEFAULT_OP_CYCLES;
 }
 
 int Execute8XY7(CHIP8_State* state, uint16_t op_code) {
-    uint8_t vx_index = (uint8_t)(op_code & 0x0F00) >> 8;
+    uint8_t vx_index = _getVxIndex(op_code);
     uint8_t vx = state->vRegister(vx_index);
 
-    uint8_t vy_index = (uint8_t)(op_code & 0x00f0) >> 4;
+    uint8_t vy_index = _getVyIndex(op_code);
     uint8_t vy = state->vRegister(vy_index);
 
     // Add and save into 16bit to catch carry
-    uint16_t difference = vx - vy;
+    uint16_t difference = vy - vx;
 
     // Save the result as 8 bit
     state->setVRegister(vx_index, (uint8_t)difference);
 
     // Set VF register to 1 or 0 based on result
-    if (difference < 0) {
+    if (difference > vy) {
         state->setVRegister(REGISTER_VF, 0);
     } else {
         state->setVRegister(REGISTER_VF, 1);
@@ -240,21 +253,21 @@ int Execute8XY7(CHIP8_State* state, uint16_t op_code) {
 }
 
 int Execute8XYE(CHIP8_State* state, uint16_t op_code) {
-    uint8_t vx_index = (uint8_t)(op_code & 0x0F00) >> 8;
+    uint8_t vx_index = _getVxIndex(op_code);
     uint8_t vx = state->vRegister(vx_index);
 
     // Save the most sig bit in VF
-    state->setVRegister(REGISTER_VF, vx & 0b1000'0000);
-    state->setVRegister(vx_index, vx << 1);
+    state->setVRegister(REGISTER_VF, (uint8_t)((vx & 0b1000'0000) >> 7));
+    state->setVRegister(vx_index, uint8_t(vx << 1));
 
     return DEFAULT_OP_CYCLES;
 }
 
 int Execute9XY0(CHIP8_State* state, uint16_t op_code) {
-    uint8_t vx_index = (uint8_t)(op_code & 0x0F00) >> 8;
+    uint8_t vx_index = _getVxIndex(op_code);
     uint8_t vx = state->vRegister(vx_index);
 
-    uint8_t vy_index = (uint8_t)(op_code & 0x00f0) >> 4;
+    uint8_t vy_index = _getVyIndex(op_code);
     uint8_t vy = state->vRegister(vy_index);
 
     if (vx != vy) {
@@ -278,7 +291,7 @@ int ExecuteBNNN(CHIP8_State* state, uint16_t op_code) {
 
 int ExecuteCNNN(CHIP8_State* state, uint16_t op_code) {
     uint8_t random = rand() % 255;
-    uint8_t vx_index = (uint8_t)(op_code & 0x0F00) >> 8;
+    uint8_t vx_index = _getVxIndex(op_code);
     state->setVRegister(vx_index, (op_code & 0x00FF) & random);
 
     return DEFAULT_OP_CYCLES;
@@ -286,10 +299,10 @@ int ExecuteCNNN(CHIP8_State* state, uint16_t op_code) {
 
 int ExecuteDXYN(CHIP8_State* state, uint16_t op_code) {
 
-    uint8_t vx_index = (uint8_t)(op_code & 0x0F00) >> 8;
+    uint8_t vx_index = _getVxIndex(op_code);
     uint8_t vx = state->vRegister(vx_index);
 
-    uint8_t vy_index = (uint8_t)(op_code & 0x00f0) >> 4;
+    uint8_t vy_index = _getVyIndex(op_code);
     uint8_t vy = state->vRegister(vy_index);
 
     uint8_t sprite_height = (uint8_t)(op_code & 0x000F);
@@ -348,7 +361,7 @@ int ExecuteDXYN(CHIP8_State* state, uint16_t op_code) {
 }
 
 int ExecuteEX9E(CHIP8_State* state, uint16_t op_code, InputInterface* input) {
-    uint8_t vx_index = (uint8_t)(op_code & 0x0F00) >> 8;
+    uint8_t vx_index = _getVxIndex(op_code);
     uint8_t vx = state->vRegister(vx_index);
 
     if (input->isPressed(vx) == true) {
@@ -360,7 +373,7 @@ int ExecuteEX9E(CHIP8_State* state, uint16_t op_code, InputInterface* input) {
 }
 
 int ExecuteEXA1(CHIP8_State* state, uint16_t op_code, InputInterface* input) {
-    uint8_t vx_index = (uint8_t)(op_code & 0x0F00) >> 8;
+    uint8_t vx_index = _getVxIndex(op_code);
     uint8_t vx = state->vRegister(vx_index);
 
     if (input->isPressed(vx) == false) {
@@ -372,7 +385,7 @@ int ExecuteEXA1(CHIP8_State* state, uint16_t op_code, InputInterface* input) {
 }
 
 int ExecuteFX07(CHIP8_State* state, uint16_t op_code) {
-    uint8_t vx_index = (uint8_t)(op_code & 0x0F00) >> 8;
+    uint8_t vx_index = _getVxIndex(op_code);
     uint8_t delay_timer = state->delayTimer();
 
     state->setVRegister(vx_index, delay_timer);
@@ -381,7 +394,7 @@ int ExecuteFX07(CHIP8_State* state, uint16_t op_code) {
 }
 
 int ExecuteFX0A(CHIP8_State* state, uint16_t op_code, InputInterface* input) {
-    uint8_t vx_index = (uint8_t)(op_code & 0x0F00) >> 8;
+    uint8_t vx_index = _getVxIndex(op_code);
     uint8_t key = input->getInput();
 
     state->setVRegister(vx_index, key);
@@ -390,7 +403,7 @@ int ExecuteFX0A(CHIP8_State* state, uint16_t op_code, InputInterface* input) {
 }
 
 int ExecuteFX15(CHIP8_State* state, uint16_t op_code) {
-    uint8_t vx_index = (uint8_t)(op_code & 0x0F00) >> 8;
+    uint8_t vx_index = _getVxIndex(op_code);
     uint8_t vx = state->vRegister(vx_index);
 
     state->setDelayTimer(vx);
@@ -399,7 +412,7 @@ int ExecuteFX15(CHIP8_State* state, uint16_t op_code) {
 }
 
 int ExecuteFX18(CHIP8_State* state, uint16_t op_code) {
-    uint8_t vx_index = (uint8_t)(op_code & 0x0F00) >> 8;
+    uint8_t vx_index = _getVxIndex(op_code);
     uint8_t vx = state->vRegister(vx_index);
 
     state->setSoundTimer(vx);
@@ -408,26 +421,26 @@ int ExecuteFX18(CHIP8_State* state, uint16_t op_code) {
 }
 
 int ExecuteFX1E(CHIP8_State* state, uint16_t op_code) {
-    uint8_t vx_index = (uint8_t)(op_code & 0x0F00) >> 8;
+    uint8_t vx_index = _getVxIndex(op_code);
     uint8_t vx = state->vRegister(vx_index);
 
-    uint8_t index_register = state->indexRegister();
+    uint16_t index_register = state->indexRegister();
 
     uint16_t new_index_register = index_register + vx;
     state->setIndexRegister(new_index_register);
 
     if (new_index_register > 0xFFF) {
-        state->setVRegister(0x0F, 1);
+        state->setVRegister(0xF, 1);
     }
     else {
-        state->setVRegister(0x0F, 0);
+        state->setVRegister(0xF, 0);
     }
 
     return DEFAULT_OP_CYCLES;
 }
 
 int ExecuteFX29(CHIP8_State* state, uint16_t op_code) {
-    uint8_t vx_index = (uint8_t)(op_code & 0x0F00) >> 8;
+    uint8_t vx_index = _getVxIndex(op_code);
     uint8_t vx = state->vRegister(vx_index);
     uint16_t font_location = FONT_MEMORY_LOCATION + vx;
 
@@ -436,28 +449,27 @@ int ExecuteFX29(CHIP8_State* state, uint16_t op_code) {
     return DEFAULT_OP_CYCLES;
 }
 
-int8_t _GetDecimalDigit(int8_t integer, uint8_t n) {
-    return (int8_t)((integer % (uint8_t)pow(10, n))/pow(10, n-1));
-}
-
 int ExecuteFX33(CHIP8_State* state, uint16_t op_code) {
-    uint8_t vx_index = (uint8_t)(op_code & 0x0F00) >> 8;
+    uint8_t vx_index = _getVxIndex(op_code);
     uint8_t vx = state->vRegister(vx_index);
 
-    uint8_t most_sig = _GetDecimalDigit(vx, 3);
-    uint8_t middle_sig = _GetDecimalDigit(vx, 2);
-    uint8_t least_sig = _GetDecimalDigit(vx, 1);
+    std::string vx_string = std::to_string(vx);
+    uint8_t digits[] = {0 ,0 ,0};
+
+    for (int i = 0; i < vx_string.length(); i++) {
+        digits[i + (3 - vx_string.length())] = vx_string.at(i) - 48;
+    }
 
     uint16_t index_register_address = state->indexRegister();
-    state->setMemoryValue(index_register_address, most_sig);
-    state->setMemoryValue(index_register_address + 1, middle_sig);
-    state->setMemoryValue(index_register_address + 2, least_sig);
+    state->setMemoryValue(index_register_address, digits[0]);
+    state->setMemoryValue(index_register_address + 1, digits[1]);
+    state->setMemoryValue(index_register_address + 2, digits[2]);
 
     return DEFAULT_OP_CYCLES;
 }
 
 int ExecuteFX55(CHIP8_State* state, uint16_t op_code) {
-    uint8_t vx_index = (uint8_t)(op_code & 0x0F00) >> 8;
+    uint8_t vx_index = _getVxIndex(op_code);
     uint16_t index_register_address = state->indexRegister();
 
     for (uint8_t i = 0; i <= vx_index; i++) {
@@ -469,10 +481,10 @@ int ExecuteFX55(CHIP8_State* state, uint16_t op_code) {
 }
 
 int ExecuteFX65(CHIP8_State* state, uint16_t op_code) {
-    uint8_t vx_index = (uint8_t)(op_code & 0x0F00) >> 8;
+    uint16_t vx_index = (uint16_t)_getVxIndex(op_code);
     uint16_t index_register_address = state->indexRegister();
 
-    for (uint8_t i = 0; i <= vx_index; i++) {
+    for (uint16_t i = 0; i <= vx_index; i++) {
         uint8_t v_value = state->memoryValue(index_register_address + i);
         state->setVRegister(i, v_value);
     }

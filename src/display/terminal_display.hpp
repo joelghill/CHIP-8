@@ -6,6 +6,11 @@
 #include "display_interface.hpp"
 #include "../chip-8_state.hpp"
 
+const static int TOP_PADDING = 5;
+const static int BOTTOM_PADDING = 5;
+const static int LEFT_PADDING = 5;
+const static int RIGHT_PADDING = 5;
+
 /**
  * @brief An interface used for updateing the emulator display
  *

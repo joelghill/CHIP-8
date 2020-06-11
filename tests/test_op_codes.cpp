@@ -437,8 +437,9 @@ void test8XY6() {
 /**
  * @brief Tests the 0x8XY7 op code on the chip state
  *
- * 0x8XY7 - VX is set to VY minus VX.
- * VF is set to 0 when there's a borrow, and 1 when there isn't.
+ * 0x8XY7 - VX is set to VY minus VX. No borrow
+ * If Vx > Vy, then VF is set to 1, otherwise 0.
+ * Then Vy is subtracted from Vx, and the results stored in Vx.
  *
  */
 void test8XY7() {
@@ -461,15 +462,15 @@ void test8XY7() {
     Execute8XY7(chip_8_state, 0x8107);
     assert(chip_8_state->vRegister(1) == (uint8_t)(v0 - v1));
     assert(chip_8_state->vRegister(0) == v0);
-    // There should be a borrow for 0x05 - 0x0C5
-    assert(chip_8_state->vRegister(15) == 0);
+    // 0xC5 > 0x05
+    assert(chip_8_state->vRegister(15) == 1);
 
     // V3 is added to V2
     Execute8XY7(chip_8_state, 0x8327);
     assert(chip_8_state->vRegister(3) == (uint8_t)(v2 - v3));
     assert(chip_8_state->vRegister(2) == v2);
-    // There should be a borrow here
-    assert(chip_8_state->vRegister(15) == 1);
+    // 0x00 ! > 0x01
+    assert(chip_8_state->vRegister(15) == 0);
 }
 
 /**
@@ -625,7 +626,6 @@ void testFX18() {
  * @brief Tests the 0xFX1E op code on the chip state
  *
  * 0xFX1E - Adds VX to I.
- * VF is set to 1 when there is a range overflow (I+VX>0xFFF), and to 0 when there isn't.
  *
  */
 void testFX1E() {
@@ -643,12 +643,10 @@ void testFX1E() {
 
     ExecuteFX1E(chip_8_state, 0xF01E);
     assert(chip_8_state->indexRegister() == (v0 + initial_i));
-    assert(chip_8_state->vRegister(0xf) == 0);
 
     initial_i = chip_8_state->indexRegister();
     ExecuteFX1E(chip_8_state, 0xF11E);
     assert(chip_8_state->indexRegister() == (v1 + initial_i));
-    assert(chip_8_state->vRegister(0xf) == 1);
 }
 
 /**
@@ -670,11 +668,11 @@ void testsFX29() {
 
     // Move "1" character to index
     ExecuteFX29(chip_8_state, 0xF029);
-    assert(chip_8_state->indexRegister() == (FONT_MEMORY_LOCATION + v0));
+    assert(chip_8_state->indexRegister() == 5);
 
     // Move "d" character to index
     ExecuteFX29(chip_8_state, 0xFE29);
-    assert(chip_8_state->indexRegister() == (FONT_MEMORY_LOCATION + v15));
+    assert(chip_8_state->indexRegister() == 70);
 }
 
 /**
@@ -692,11 +690,12 @@ void testFX33() {
     uint8_t* v_registers = new uint8_t[V_REGISTER_COUNT];
 
     uint8_t v0 = 0xFF;
+    uint8_t v1 = 0x06;
 
     CHIP8_State* chip_8_state = new CHIP8_State(INITAL_PROGRAM_COUNTER, INITAL_PROGRAM_COUNTER, 0, 0, v_registers, memory);
     chip_8_state->setVRegister(0, v0);
+    chip_8_state->setVRegister(1, v1);
 
-    // Move "1" character to index
     ExecuteFX33(chip_8_state, 0xF033);
 
     uint16_t index_register = chip_8_state->indexRegister();
@@ -704,6 +703,12 @@ void testFX33() {
     assert(chip_8_state->memoryValue(index_register) == 0x02);
     assert(chip_8_state->memoryValue(index_register + 1) == 0x05);
     assert(chip_8_state->memoryValue(index_register + 2) == 0x05);
+
+    ExecuteFX33(chip_8_state, 0xF133);
+
+    assert(chip_8_state->memoryValue(index_register) == 0x00);
+    assert(chip_8_state->memoryValue(index_register + 1) == 0x00);
+    assert(chip_8_state->memoryValue(index_register + 2) == 0x06);
 }
 
 /**
@@ -766,6 +771,135 @@ void testFX65() {
     assert(chip_8_state->vRegister(2) == i2);
 }
 
+/**
+ * @brief Executes the 0xDXYN op code on the chip state
+ *
+ * 0xDXYN - Draws a sprite at coordinate (VX, VY) that has a width of 8 pixels and a height of N pixels.
+ * Each row of 8 pixels is read as bit-coded starting from memory location I;
+ * I value doesn’t change after the execution of this instruction. As described above, VF is set to 1 if any screen
+ *  pixels are flipped from set to unset when the sprite is drawn, and to 0 if that doesn’t happen
+ */
+void testDXYN() {
+    uint8_t* memory = new uint8_t[RAM_SIZE];
+    uint8_t* v_registers = new uint8_t[V_REGISTER_COUNT];
+
+    uint8_t v0 = 0x07;
+    uint8_t v1 = 0x00;
+
+    CHIP8_State* chip_8_state = new CHIP8_State(INITAL_PROGRAM_COUNTER, INITAL_PROGRAM_COUNTER, 0, 0, v_registers, memory);
+
+    // Set the V Registers
+    chip_8_state->setVRegister(0, v0);
+    chip_8_state->setVRegister(1, v1);
+    chip_8_state->setVRegister(0xF, 0);
+
+    // Adding a sprite 1 row high into memory.
+    // Sprite is: ########
+    uint16_t index_register = chip_8_state->indexRegister();
+    chip_8_state->setMemoryValue(index_register, 0xFF);
+
+    // Draw the single row sprite at 0, 0 (V1, V1)
+    ExecuteDXYN(chip_8_state, 0xF111);
+
+    // Ensure the sprite are active
+    for (int i = 0; i < 8; i++) {
+        assert(chip_8_state->displayValue(i, 0) == true);
+    }
+    // Ensure VF was not set
+    assert(chip_8_state->vRegister(0xF) == false);
+
+    // Draw the single row sprite at 0, 7 (V0, V1)
+    // This should overlap with the first sprite
+    ExecuteDXYN(chip_8_state, 0xF011);
+
+    // Ensure the pixels are active except where they overlap
+    // Display should look like this: ####### #######
+    for (int i = 0; i < 15; i++) {
+
+        if (i == 7) {
+            assert(chip_8_state->displayValue(i, 0) == false);
+        } else {
+            assert(chip_8_state->displayValue(i, 0) == true);
+        }
+    }
+
+    // Ensure VF was set since a bit was flipped from set to unset
+    assert(chip_8_state->vRegister(0xF) == true);
+}
+
+/**
+ * @brief Executes the 0xDXYN op code when an overflow on the x axis occurs
+ *
+ */
+void testDXYNOverflowX() {
+    uint8_t* memory = new uint8_t[RAM_SIZE];
+    uint8_t* v_registers = new uint8_t[V_REGISTER_COUNT];
+
+    uint8_t v0 = (uint8_t)63;
+    uint8_t v1 = 0x00;
+
+    CHIP8_State* chip_8_state = new CHIP8_State(INITAL_PROGRAM_COUNTER, INITAL_PROGRAM_COUNTER, 0, 0, v_registers, memory);
+
+    // Set the V Registers
+    chip_8_state->setVRegister(0, v0);
+    chip_8_state->setVRegister(1, v1);
+    chip_8_state->setVRegister(0xF, 0);
+
+    // Adding a sprite 1 row high into memory.
+    // Sprite is: ########
+    uint16_t index_register = chip_8_state->indexRegister();
+    chip_8_state->setMemoryValue(index_register, 0xFF);
+
+    // Draw the single row sprite at 63, 0 (V0, V1)
+    // Majority of sprite should overlap: |####### .. screen .. #|
+    ExecuteDXYN(chip_8_state, 0xD011);
+    assert(chip_8_state->displayValue(0, 0) == true);
+    assert(chip_8_state->displayValue(1, 0) == true);
+    assert(chip_8_state->displayValue(2, 0) == true);
+    assert(chip_8_state->displayValue(3, 0) == true);
+    assert(chip_8_state->displayValue(4, 0) == true);
+    assert(chip_8_state->displayValue(5, 0) == true);
+    assert(chip_8_state->displayValue(6, 0) == true);
+    assert(chip_8_state->displayValue(7, 0) == false);
+    assert(chip_8_state->displayValue(63, 0) == true);
+}
+
+/**
+ * @brief Executes the 0xDXYN op code when an overflow on the y axis occurs
+ *
+ */
+void testDXYNOverflowY() {
+    uint8_t* memory = new uint8_t[RAM_SIZE];
+    uint8_t* v_registers = new uint8_t[V_REGISTER_COUNT];
+
+    uint8_t v0 = 0x00;
+    uint8_t v1 = (uint8_t)32;
+
+    CHIP8_State* chip_8_state = new CHIP8_State(INITAL_PROGRAM_COUNTER, INITAL_PROGRAM_COUNTER, 0, 0, v_registers, memory);
+
+    // Set the V Registers
+    chip_8_state->setVRegister(0, v0);
+    chip_8_state->setVRegister(1, v1);
+    chip_8_state->setVRegister(0xF, 0);
+
+    // Adding a sprite 1 row high into memory.
+    // Sprite is: ########
+    uint16_t index_register = chip_8_state->indexRegister();
+    chip_8_state->setMemoryValue(index_register, 0xFF);
+
+    // Draw the single row sprite at 63, 0 (V0, V1)
+    // Majority of sprite should overlap: |####### .. screen .. #|
+    ExecuteDXYN(chip_8_state, 0xD011);
+    assert(chip_8_state->displayValue(0, 0) == true);
+    assert(chip_8_state->displayValue(1, 0) == true);
+    assert(chip_8_state->displayValue(2, 0) == true);
+    assert(chip_8_state->displayValue(3, 0) == true);
+    assert(chip_8_state->displayValue(4, 0) == true);
+    assert(chip_8_state->displayValue(5, 0) == true);
+    assert(chip_8_state->displayValue(6, 0) == true);
+    assert(chip_8_state->displayValue(7, 0) == true);
+}
+
 int main(int argc, char** argv){
 
     test00E0();
@@ -796,6 +930,9 @@ int main(int argc, char** argv){
     testFX33();
     testFX55();
     testFX65();
+    testDXYN();
+    testDXYNOverflowX();
+    testDXYNOverflowY();
 
     return 0;
 }

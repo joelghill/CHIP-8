@@ -9,5 +9,5 @@ bool MockInput::isPressed(uint8_t input_code) {
 }
 
 uint8_t MockInput::getInput() {
-    return 0x01;//(uint8_t)rand() % 16;
+    return (uint8_t)rand() % 9;
 }

@@ -236,18 +236,18 @@ int Execute8XY7(CHIP8_State* state, uint16_t op_code) {
     uint8_t vy_index = _getVyIndex(op_code);
     uint8_t vy = state->vRegister(vy_index);
 
-    // Add and save into 16bit to catch carry
-    uint16_t difference = vy - vx;
-
-    // Save the result as 8 bit
-    state->setVRegister(vx_index, (uint8_t)difference);
-
-    // Set VF register to 1 or 0 based on result
-    if (difference > vy) {
+    // Set VF register to 1 if vy is greater than vxt
+    if (vy > vx) {
         state->setVRegister(REGISTER_VF, 0);
     } else {
         state->setVRegister(REGISTER_VF, 1);
     }
+
+    // Subtract vx from vy and save in vx
+    uint8_t difference = vy - vx;
+
+    // Save the result as 8 bit
+    state->setVRegister(vx_index, difference);
 
     return DEFAULT_OP_CYCLES;
 }
@@ -306,14 +306,7 @@ int ExecuteDXYN(CHIP8_State* state, uint16_t op_code) {
     uint8_t vy = state->vRegister(vy_index);
 
     uint8_t sprite_height = (uint8_t)(op_code & 0x000F);
-    if (sprite_height + vy > DISPLAY_HEIGHT) {
-        sprite_height = DISPLAY_HEIGHT - vy;
-    }
-
     uint8_t sprite_width = 8;
-    if ((vx + sprite_width) > DISPLAY_WIDTH) {
-        sprite_width = DISPLAY_WIDTH - vx;
-    }
 
     bool changed_bit = false;
     uint16_t index_register = state->indexRegister();
@@ -329,24 +322,28 @@ int ExecuteDXYN(CHIP8_State* state, uint16_t op_code) {
             bool sprite_bit = (row_data & (0b10000000 >> pixel_index)) > 0;
 
             int display_pixel_y = vy + row_index;
+            if (display_pixel_y >= DISPLAY_HEIGHT) {
+                display_pixel_y -= DISPLAY_HEIGHT;
+            }
+
             int display_pixel_x =  vx + pixel_index;
+            if (display_pixel_x >= DISPLAY_WIDTH) {
+                display_pixel_x -= DISPLAY_WIDTH;
+            }
 
             bool display_bit = state->displayValue(display_pixel_x, display_pixel_y);
 
+            // The new bit to display is the xor of the sprite bit and the current display bit
+            bool new_display_bit = display_bit ^ sprite_bit;
+
             // If the display bit will change and the display bit is being cleared
-            if ((display_bit != sprite_bit) && display_bit == true) {
+            if (new_display_bit == false && display_bit == true) {
                 // Set the flag that VF needs to be updated
                 changed_bit = true;
             }
 
-            // If we're setting the bit
-            if (sprite_bit == true) {
-                // Set the bit based on the pixel offset
-                state->setDisplayValue(display_pixel_x, display_pixel_y, true);
-            } else {
-                // Clear the bit based on the pixel offset
-                state->setDisplayValue(display_pixel_x, display_pixel_y, false);
-            }
+            // Set the bit based on the pixel offset
+            state->setDisplayValue(display_pixel_x, display_pixel_y, new_display_bit);
         }
     }
 
@@ -429,20 +426,13 @@ int ExecuteFX1E(CHIP8_State* state, uint16_t op_code) {
     uint16_t new_index_register = index_register + vx;
     state->setIndexRegister(new_index_register);
 
-    if (new_index_register > 0xFFF) {
-        state->setVRegister(0xF, 1);
-    }
-    else {
-        state->setVRegister(0xF, 0);
-    }
-
     return DEFAULT_OP_CYCLES;
 }
 
 int ExecuteFX29(CHIP8_State* state, uint16_t op_code) {
     uint8_t vx_index = _getVxIndex(op_code);
     uint8_t vx = state->vRegister(vx_index);
-    uint16_t font_location = FONT_MEMORY_LOCATION + vx;
+    uint16_t font_location = FONT_MEMORY_LOCATION + (uint16_t)(vx * 5);
 
     state->setIndexRegister(font_location);
 
@@ -474,7 +464,7 @@ int ExecuteFX55(CHIP8_State* state, uint16_t op_code) {
 
     for (uint8_t i = 0; i <= vx_index; i++) {
         uint8_t v_value = state->vRegister(i);
-        state->setMemoryValue(index_register_address + i, v_value);
+        state->setMemoryValue((uint16_t)(index_register_address + i), v_value);
     }
 
     return DEFAULT_OP_CYCLES;

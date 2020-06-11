@@ -6,12 +6,13 @@
 using namespace std;
 
 TerminalDisplay::TerminalDisplay() {
+    setlocale(LC_ALL, "");
     initscr();
     cbreak();
     noecho();
     keypad(stdscr, TRUE);
 
-    this->window_ = newwin(DISPLAY_HEIGHT, DISPLAY_WIDTH, 1, 1);
+    this->window_ = newwin(DISPLAY_HEIGHT, DISPLAY_WIDTH*2, 0, 0);
 }
 
 TerminalDisplay::~TerminalDisplay() {
@@ -26,9 +27,9 @@ void TerminalDisplay::updateDisplay(CHIP8_State* state) {
         for (int i = 0; i < DISPLAY_WIDTH; i++) {
             bool is_pixel_active = state->displayValue(i, j);
             if (is_pixel_active) {
-                mvwaddch(this->window_, j, i, ACS_BLOCK);
+                mvwprintw(this->window_, j, i*2, "██");
             } else {
-                mvwaddch(this->window_, j, i, ' ');
+                mvwprintw(this->window_, j, i*2, "  ");
             }
         }
     }

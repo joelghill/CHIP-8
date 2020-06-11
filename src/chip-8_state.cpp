@@ -52,7 +52,7 @@ CHIP8_State::CHIP8_State(
    this->stack_ = &(this->memory_[STACK_MEMORY_LOCATION]);
 
     // Load the font set into the first 80 bytes of memory
-    for (uint8_t character_index = 0; character_index < 5; character_index++) {
+    for (uint8_t character_index = 0; character_index < 80; character_index++) {
         uint8_t character_address = character_index + FONT_MEMORY_LOCATION;
         this->memory_[character_address] = this->fontset_[character_index];
     }

@@ -21,7 +21,7 @@ static int RAM_SIZE = 4096;
 static uint16_t INITAL_PROGRAM_COUNTER = 0x200;
 static uint16_t DISPLAY_MEMORY_LOCATION = 0xF00;
 static uint16_t STACK_MEMORY_LOCATION = 0xEA0;
-static uint16_t FONT_MEMORY_LOCATION = 0x000;
+static uint16_t FONT_MEMORY_LOCATION = 0x0;
 
 class CHIP8_State
 {

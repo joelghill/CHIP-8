@@ -201,8 +201,9 @@ int Execute8XY6(CHIP8_State* state, uint16_t op_code);
 /**
  * @brief Executes the 0x8XY7 op code on the chip state
  *
- * 0x8XY7 - VX is set to VY subtracted from VX.
- * VF is set to 0 when there's a borrow, and 1 when there isn't.
+ * Set Vx = Vy - Vx, set VF = NOT borrow.
+ * If Vy > Vx, then VF is set to 1, otherwise 0.
+ * Then Vx is subtracted from Vy, and the results stored in Vx.
  *
  * @param state Current chip state
  * @param op_code The op code to execute
@@ -368,7 +369,6 @@ int ExecuteFX18(CHIP8_State* state, uint16_t op_code);
  * @brief Executes the 0xFX1E op code on the chip state
  *
  * 0xFX1E - Adds VX to I.
- * VF is set to 1 when there is a range overflow (I+VX>0xFFF), and to 0 when there isn't.
  *
  * @param state Current chip state
  * @param op_code The op code to execute

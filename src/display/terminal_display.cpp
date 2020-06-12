@@ -8,15 +8,10 @@ using namespace std;
 TerminalDisplay::TerminalDisplay() {
     setlocale(LC_ALL, "");
     initscr();
-    cbreak();
     noecho();
     keypad(stdscr, TRUE);
 
     this->window_ = newwin(DISPLAY_HEIGHT, DISPLAY_WIDTH*2, 0, 0);
-}
-
-TerminalDisplay::~TerminalDisplay() {
-    endwin();
 }
 
 void TerminalDisplay::updateDisplay(CHIP8_State* state) {
@@ -35,4 +30,8 @@ void TerminalDisplay::updateDisplay(CHIP8_State* state) {
     }
     //Refresh window to show changes
     wrefresh(this->window_);
+}
+
+WINDOW* TerminalDisplay::getWindow() {
+    return this->window_;
 }

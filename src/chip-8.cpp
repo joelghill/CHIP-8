@@ -52,15 +52,7 @@ void CHIP8::Start() {
         // Get the time at the start or the frame
         system_clock::time_point frame_start_time = system_clock::now();
 
-        // Process the frame
-        int cycles = this->ProcessCurrentFrame();
-
-        // The CHIP-8 processor runs at approximately 500Hz, which is 2ms per cycle
-        // Wait time in milliseconds for the instruction
-        int wait_time = 2 * cycles;
-
         // Update timers
-        timer_counter ++;
         if (timer_counter > 7) {
             timer_counter = 0;
 
@@ -75,6 +67,14 @@ void CHIP8::Start() {
                 this->state_->setSoundTimer(sound_time - 1);
             }
         }
+        timer_counter ++;
+
+        // Process the frame
+        int cycles = this->ProcessCurrentFrame();
+
+        // The CHIP-8 processor runs at approximately 500Hz, which is 2ms per cycle
+        // Wait time in milliseconds for the instruction
+        int wait_time = 2 * cycles;
 
         // Get the time at the start or the frame
         system_clock::time_point frame_end = system_clock::now();
@@ -86,6 +86,10 @@ void CHIP8::Start() {
 }
 
 int CHIP8::ProcessCurrentFrame() {
+
+    // Refresh the display
+    this->display_->updateDisplay(this->state_);
+
      // Get current PC
     uint16_t current_pc = this->state_->programCounter();
 
@@ -101,9 +105,6 @@ int CHIP8::ProcessCurrentFrame() {
 
     // Process the op code and return the number of CPU cycles used to process op code
     int cycles = this->ProcessOpCode(op_code);
-
-    // After everthing has been processed, update the display
-    this->display_->updateDisplay(this->state_);
 
     return cycles;
 }

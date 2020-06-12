@@ -4,8 +4,7 @@
 
 #include "chip-8.hpp"
 #include "io.hpp"
-#include "input/input_factory.hpp"
-#include "input/mock_input.hpp"
+#include "input/terminal_input.hpp"
 #include "display/terminal_display.hpp"
 
 using namespace std;
@@ -24,7 +23,7 @@ int main(int argc, char** argv){
     }
 
     TerminalDisplay* display = new TerminalDisplay();
-    InputInterface* input = new MockInput();
+    TerminalInput* input = new TerminalInput(display->getWindow());
 
     CHIP8* chip_8 = new CHIP8(display, input);
 

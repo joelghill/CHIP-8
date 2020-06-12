@@ -21,6 +21,7 @@ public:
     /**
      * @brief Construct a new Terminal Display object
      *
+     * @param window The terminal window
      */
     TerminalDisplay();
 
@@ -28,7 +29,7 @@ public:
      * @brief Destroy the Terminal Display object
      *
      */
-    ~TerminalDisplay();
+    ~TerminalDisplay() = default;
 
     /**
      * @brief Updates the emulator display using the provided display state
@@ -36,6 +37,13 @@ public:
      * @param display_state A byte array containing the current display data
      */
     virtual void updateDisplay(CHIP8_State* state);
+
+    /**
+     * @brief Gets the Window object
+     *
+     * @return WINDOW*
+     */
+    WINDOW* getWindow();
 
 private:
 

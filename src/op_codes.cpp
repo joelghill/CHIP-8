@@ -467,6 +467,7 @@ int ExecuteFX55(CHIP8_State* state, uint16_t op_code) {
         state->setMemoryValue((uint16_t)(index_register_address + i), v_value);
     }
 
+    state->setIndexRegister(index_register_address + vx_index + 1);
     return DEFAULT_OP_CYCLES;
 }
 
@@ -479,5 +480,6 @@ int ExecuteFX65(CHIP8_State* state, uint16_t op_code) {
         state->setVRegister(i, v_value);
     }
 
+    state->setIndexRegister(index_register_address + vx_index + 1);
     return DEFAULT_OP_CYCLES;
 }

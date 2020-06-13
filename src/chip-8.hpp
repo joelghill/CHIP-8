@@ -79,6 +79,12 @@ private:
      *
      */
     CHIP8_State* state_;
+
+    /**
+     * @brief Flag set to true when the display must be refreshed
+     *
+     */
+    bool draw_flag_ = false;
 };
 
 #endif

@@ -87,9 +87,6 @@ void CHIP8::Start() {
 
 int CHIP8::ProcessCurrentFrame() {
 
-    // Refresh the display
-    this->display_->updateDisplay(this->state_);
-
      // Get current PC
     uint16_t current_pc = this->state_->programCounter();
 
@@ -106,6 +103,13 @@ int CHIP8::ProcessCurrentFrame() {
     // Process the op code and return the number of CPU cycles used to process op code
     int cycles = this->ProcessOpCode(op_code);
 
+    if (this->draw_flag_ == true) {
+        // Reset flag
+        this->draw_flag_ = false;
+        // Refresh the display
+        this->display_->updateDisplay(this->state_);
+    }
+
     return cycles;
 }
 
@@ -118,6 +122,7 @@ int CHIP8::ProcessOpCode(uint16_t op_code) {
     switch(nyble_1) {
         case 0x00:
             if (op_code == 0x00E0) {
+                this->draw_flag_ = true;
                 return Execute00E0(this->state_);
 
             } else if (op_code == 0x00EE) {
@@ -241,6 +246,7 @@ int CHIP8::ProcessOpCode(uint16_t op_code) {
 
             case 0x0D: {
                 // DXYN - Draws a sprite at coordinate (VX, VY) that has a width of 8 pixels and a height of N pixels.
+                this->draw_flag_ = true;
                 return ExecuteDXYN(this->state_, op_code);
             }
 

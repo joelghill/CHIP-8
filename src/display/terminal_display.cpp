@@ -8,7 +8,6 @@ using namespace std;
 TerminalDisplay::TerminalDisplay() {
     setlocale(LC_ALL, "");
     initscr();
-    noecho();
     keypad(stdscr, TRUE);
 
     this->window_ = newwin(DISPLAY_HEIGHT, DISPLAY_WIDTH*2, 0, 0);

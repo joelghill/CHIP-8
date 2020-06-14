@@ -2,7 +2,10 @@
 #define TERMINAL_INPUT_H
 
 #include <iostream>
+#include <map>
+#include <mutex>
 #include <ncurses.h>
+#include <thread>
 #include "input_interface.hpp"
 
 using namespace std;
@@ -27,7 +30,7 @@ public:
      * @brief Destroys the Terminal Input object
      *
      */
-    ~TerminalInput() = default;
+    ~TerminalInput();
 
         /**
      * @brief Method used to determine whether or not a current input button is currently pressed
@@ -45,10 +48,49 @@ public:
      */
     virtual uint8_t getInput();
 
+    /**
+     * @brief Method used to update the input state map
+     *
+     */
+    virtual void updateInputState();
+
 private:
 
+    /**
+     * @brief Instance of the window input is retrieved from
+     *
+     */
     WINDOW* window_;
 
+    /**
+     * @brief Last character retrieved from input
+     *
+     */
+    uint8_t last_keypress;
+
+    /**
+     * @brief Mutext to control thread access
+     *
+     */
+    mutex read_input_mutext_;
+
+
+    mutex input_stale_mutex;
+
+    mutex lock_mutex;
+
+    /**
+     * @brief A flag used to indicate whether or not the last input char has already been read
+     *
+     */
+    bool input_stale = false;
+
+
+    /**
+     * @brief Thread used to continuously update the input state
+     *
+     */
+    thread* input_thread_;
 };
 
 #endif

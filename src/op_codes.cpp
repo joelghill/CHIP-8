@@ -300,10 +300,10 @@ int ExecuteCNNN(CHIP8_State* state, uint16_t op_code) {
 int ExecuteDXYN(CHIP8_State* state, uint16_t op_code) {
 
     uint8_t vx_index = _getVxIndex(op_code);
-    uint8_t vx = state->vRegister(vx_index);
+    uint8_t vx = state->vRegister(vx_index) % DISPLAY_WIDTH;
 
     uint8_t vy_index = _getVyIndex(op_code);
-    uint8_t vy = state->vRegister(vy_index);
+    uint8_t vy = state->vRegister(vy_index) % DISPLAY_HEIGHT;
 
     uint8_t sprite_height = (uint8_t)(op_code & 0x000F);
     uint8_t sprite_width = 8;
@@ -323,12 +323,12 @@ int ExecuteDXYN(CHIP8_State* state, uint16_t op_code) {
 
             int display_pixel_y = vy + row_index;
             if (display_pixel_y >= DISPLAY_HEIGHT) {
-                display_pixel_y -= DISPLAY_HEIGHT;
+                continue;
             }
 
             int display_pixel_x =  vx + pixel_index;
             if (display_pixel_x >= DISPLAY_WIDTH) {
-                display_pixel_x -= DISPLAY_WIDTH;
+                continue;
             }
 
             bool display_bit = state->displayValue(display_pixel_x, display_pixel_y);
@@ -348,10 +348,10 @@ int ExecuteDXYN(CHIP8_State* state, uint16_t op_code) {
     }
 
     if (changed_bit) {
-        state->setVRegister(15, 1);
+        state->setVRegister(0xF, 1);
     }
     else {
-        state->setVRegister(15, 0);
+        state->setVRegister(0xF, 0);
     }
 
     return DEFAULT_OP_CYCLES;

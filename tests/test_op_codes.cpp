@@ -731,14 +731,16 @@ void testFX55() {
     chip_8_state->setVRegister(1, v1);
     chip_8_state->setVRegister(2, v2);
 
+    uint16_t index_register = chip_8_state->indexRegister();
+
     // Store V0 to V2 in memory starting at I
     ExecuteFX55(chip_8_state, 0xF255);
-
-    uint16_t index_register = chip_8_state->indexRegister();
 
     assert(chip_8_state->memoryValue(index_register) == v0);
     assert(chip_8_state->memoryValue(index_register + 1) == v1);
     assert(chip_8_state->memoryValue(index_register + 2) == v2);
+    // I = I + x + 1
+    assert(chip_8_state->indexRegister() == (index_register + 2 + 1));
 }
 
 /**
@@ -851,17 +853,18 @@ void testDXYNOverflowX() {
     chip_8_state->setMemoryValue(index_register, 0xFF);
 
     // Draw the single row sprite at 63, 0 (V0, V1)
-    // Majority of sprite should overlap: |####### .. screen .. #|
+    // Majority of sprite should overlap: |.. screen .. #|
     ExecuteDXYN(chip_8_state, 0xD011);
-    assert(chip_8_state->displayValue(0, 0) == true);
-    assert(chip_8_state->displayValue(1, 0) == true);
-    assert(chip_8_state->displayValue(2, 0) == true);
-    assert(chip_8_state->displayValue(3, 0) == true);
-    assert(chip_8_state->displayValue(4, 0) == true);
-    assert(chip_8_state->displayValue(5, 0) == true);
-    assert(chip_8_state->displayValue(6, 0) == true);
+    assert(chip_8_state->displayValue(0, 0) == false);
+    assert(chip_8_state->displayValue(1, 0) == false);
+    assert(chip_8_state->displayValue(2, 0) == false);
+    assert(chip_8_state->displayValue(3, 0) == false);
+    assert(chip_8_state->displayValue(4, 0) == false);
+    assert(chip_8_state->displayValue(5, 0) == false);
+    assert(chip_8_state->displayValue(6, 0) == false);
     assert(chip_8_state->displayValue(7, 0) == false);
     assert(chip_8_state->displayValue(63, 0) == true);
+    assert(chip_8_state->vRegister(0xF) == 0);
 }
 
 /**
@@ -888,7 +891,7 @@ void testDXYNOverflowY() {
     chip_8_state->setMemoryValue(index_register, 0xFF);
 
     // Draw the single row sprite at 63, 0 (V0, V1)
-    // Majority of sprite should overlap: |####### .. screen .. #|
+    // Majority of sprite should overlap: |######## .. screen .. |
     ExecuteDXYN(chip_8_state, 0xD011);
     assert(chip_8_state->displayValue(0, 0) == true);
     assert(chip_8_state->displayValue(1, 0) == true);
@@ -898,7 +901,64 @@ void testDXYNOverflowY() {
     assert(chip_8_state->displayValue(5, 0) == true);
     assert(chip_8_state->displayValue(6, 0) == true);
     assert(chip_8_state->displayValue(7, 0) == true);
+    assert(chip_8_state->vRegister(0xF) == 0);
 }
+
+/**
+ * @brief Executes the 0xDXYN op code when an overflow on the y axis occurs
+ *
+ */
+void testSpriteCollision() {
+    uint8_t* memory = new uint8_t[RAM_SIZE];
+    uint8_t* v_registers = new uint8_t[V_REGISTER_COUNT];
+
+    uint8_t v0 = 0x00;
+
+    CHIP8_State* chip_8_state = new CHIP8_State(INITAL_PROGRAM_COUNTER, INITAL_PROGRAM_COUNTER, 0, 0, v_registers, memory);
+
+    // Set the V Registers
+    chip_8_state->setVRegister(0, v0);
+    chip_8_state->setVRegister(1, v0);
+    chip_8_state->setVRegister(0xF, 0);
+
+    uint16_t index_register = chip_8_state->indexRegister();
+    // Adding a sprite 1 row high into memory.
+    // Sprite is: ########
+    chip_8_state->setMemoryValue(index_register, 0xFF);
+    // Adding a sprite 1 row high into memory.
+    // Sprite is: ####_###
+    chip_8_state->setMemoryValue(index_register + 1, 0x08);
+
+    // Draw the single row sprite at 0, 0 (V0, V0)
+    // Current Display state: |######## .. screen .. |
+    ExecuteDXYN(chip_8_state, 0xD001);
+    assert(chip_8_state->displayValue(0, 0) == true);
+    assert(chip_8_state->displayValue(1, 0) == true);
+    assert(chip_8_state->displayValue(2, 0) == true);
+    assert(chip_8_state->displayValue(3, 0) == true);
+    assert(chip_8_state->displayValue(4, 0) == true);
+    assert(chip_8_state->displayValue(5, 0) == true);
+    assert(chip_8_state->displayValue(6, 0) == true);
+    assert(chip_8_state->displayValue(7, 0) == true);
+    assert(chip_8_state->vRegister(0xF) == 0);
+
+    // Set Index Register to next sprite
+    chip_8_state->setIndexRegister(index_register + 1);
+
+    // Draw the single pixel sprite at 0, 0 (V0, V0)
+    // Majority of sprite should overlap: |####_###.. screen .. |
+    ExecuteDXYN(chip_8_state, 0xD001);
+    assert(chip_8_state->displayValue(0, 0) == true);
+    assert(chip_8_state->displayValue(1, 0) == true);
+    assert(chip_8_state->displayValue(2, 0) == true);
+    assert(chip_8_state->displayValue(3, 0) == true);
+    assert(chip_8_state->displayValue(4, 0) == false);
+    assert(chip_8_state->displayValue(5, 0) == true);
+    assert(chip_8_state->displayValue(6, 0) == true);
+    assert(chip_8_state->displayValue(7, 0) == true);
+    assert(chip_8_state->vRegister(0xF) == 1);
+}
+
 
 int main(int argc, char** argv){
 
@@ -933,6 +993,7 @@ int main(int argc, char** argv){
     testDXYN();
     testDXYNOverflowX();
     testDXYNOverflowY();
+    testSpriteCollision();
 
     return 0;
 }

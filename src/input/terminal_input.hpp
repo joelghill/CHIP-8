@@ -91,6 +91,8 @@ private:
      *
      */
     thread* input_thread_;
+
+    int is_pressed_buffer_ = 0;
 };
 
 #endif

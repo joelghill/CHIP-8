@@ -24,14 +24,16 @@ TerminalInput::~TerminalInput() {
 }
 
 bool TerminalInput::isPressed(uint8_t input_code) {
-    this->input_stale_mutex.lock();
+    //this->input_stale_mutex.lock();
     if (this->input_stale) {
-        this->input_stale_mutex.unlock();
+        //this->input_stale_mutex.unlock();
+        // If the input is stale, then nothing was pressed since last check
         return false;
     } else {
-        this->input_stale = true;
+        //this->input_stale = true;
         bool is_pressed = input_code == this->last_keypress;
-        this->input_stale_mutex.unlock();
+        //this->input_stale_mutex.unlock();
+
         return is_pressed;
     }
 }
@@ -72,14 +74,15 @@ void TerminalInput::updateInputState() {
         this->read_input_mutext_.lock();
         this->lock_mutex.unlock();
         // wait for input
+        this->input_stale = true;
         char input = getchar();
+        fflush(stdin);
         this->last_keypress = char_to_code[input];
         // leave critical section
         this->read_input_mutext_.unlock();
 
         // Update the flag indicating new input has been set
-        this->input_stale_mutex.lock();
         this->input_stale = false;
-        this->input_stale_mutex.unlock();
+        this_thread::sleep_for (chrono::milliseconds(100));
     }
 }

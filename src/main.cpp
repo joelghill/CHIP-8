@@ -4,7 +4,7 @@
 
 #include "chip-8.hpp"
 #include "io.hpp"
-#include "input/sdl2_input.hpp"
+#include "input/terminal_input.hpp"
 #include "display/terminal_display.hpp"
 #include "display/mock_display.hpp"
 
@@ -23,9 +23,8 @@ int main(int argc, char** argv){
         return -1;
     }
 
-    // TerminalDisplay* display = new TerminalDisplay();
-    MockDisplay* display = new MockDisplay();
-    SDL2Input* input = new SDL2Input();
+    TerminalDisplay* display = new TerminalDisplay();
+    TerminalInput* input = new TerminalInput(display->getWindow());
 
     CHIP8* chip_8 = new CHIP8(display, input);
 

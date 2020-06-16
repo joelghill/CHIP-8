@@ -8,3 +8,5 @@ add_executable(chip-8 main.cpp ./input/terminal_input.cpp ./display/terminal_dis
 
 target_link_libraries(chip-8 ${CURSES_LIBRARIES})
 target_link_libraries(chip-8 chip-8_lib)
+
+install(TARGETS chip-8)

@@ -74,11 +74,6 @@ private:
      */
     mutex read_input_mutext_;
 
-
-    mutex input_stale_mutex;
-
-    mutex lock_mutex;
-
     /**
      * @brief A flag used to indicate whether or not the last input char has already been read
      *
@@ -91,8 +86,6 @@ private:
      *
      */
     thread* input_thread_;
-
-    int is_pressed_buffer_ = 0;
 };
 
 #endif

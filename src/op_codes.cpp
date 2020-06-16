@@ -202,14 +202,13 @@ int Execute8XY5(CHIP8_State* state, uint16_t op_code) {
     uint8_t vy_index = _getVyIndex(op_code);
     uint8_t vy = state->vRegister(vy_index);
 
-    // Subtract and save into 16bit to catch carry
     uint8_t difference = vx - vy;
 
     // Save result as 8bits
     state->setVRegister(vx_index, (uint8_t)difference);
 
     // Set VF register to 1 or 0
-    if (difference > vx) {
+    if (vx > vy) {
         // There was a borrow, set VF
         state->setVRegister(REGISTER_VF, 1);
     } else {
@@ -238,9 +237,9 @@ int Execute8XY7(CHIP8_State* state, uint16_t op_code) {
 
     // Set VF register to 1 if vy is greater than vxt
     if (vy > vx) {
-        state->setVRegister(REGISTER_VF, 0);
-    } else {
         state->setVRegister(REGISTER_VF, 1);
+    } else {
+        state->setVRegister(REGISTER_VF, 0);
     }
 
     // Subtract vx from vy and save in vx

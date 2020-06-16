@@ -411,7 +411,7 @@ int ExecuteFX33(CHIP8_State* state, uint16_t op_code);
  * @brief Executes the 0xFX55 op code on the chip state
  *
  * 0xFX55 - Stores V0 to VX (including VX) in memory starting at address I.
- * The offset from I is increased by 1 for each value written, but I itself is left unmodified.
+ * The offset from I is increased by 1 for each value written.
  *
  * @param state Current chip state
  * @param op_code The op code to execute
@@ -424,7 +424,7 @@ int ExecuteFX55(CHIP8_State* state, uint16_t op_code);
  * @brief Executes the 0xFX65 op code on the chip state
  *
  * 0xFX65 - Fills V0 to VX (including VX) with values from memory starting at address I.
- * The offset from I is increased by 1 for each value written, but I itself is left unmodified.
+ * The offset from I is increased by 1 for each value written.
  *
  * @param state Current chip state
  * @param op_code The op code to execute

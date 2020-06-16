@@ -403,14 +403,14 @@ void test8XY5() {
     assert(chip_8_state->vRegister(1) == (uint8_t)(v1 - v0));
     assert(chip_8_state->vRegister(0) == v0);
     // No borrow
-    assert(chip_8_state->vRegister(15) == 0);
+    assert(chip_8_state->vRegister(15) == 1);
 
     // V3 is added to V2
     Execute8XY5(chip_8_state, 0x8325);
     assert(chip_8_state->vRegister(3) == (uint8_t)(v3 - v2));
     assert(chip_8_state->vRegister(2) == v2);
     // There should be a borrow here
-    assert(chip_8_state->vRegister(15) == 1);
+    assert(chip_8_state->vRegister(15) == 0);
 }
 
 /**
@@ -463,14 +463,14 @@ void test8XY7() {
     assert(chip_8_state->vRegister(1) == (uint8_t)(v0 - v1));
     assert(chip_8_state->vRegister(0) == v0);
     // 0xC5 > 0x05
-    assert(chip_8_state->vRegister(15) == 1);
+    assert(chip_8_state->vRegister(15) == 0);
 
     // V3 is added to V2
     Execute8XY7(chip_8_state, 0x8327);
     assert(chip_8_state->vRegister(3) == (uint8_t)(v2 - v3));
     assert(chip_8_state->vRegister(2) == v2);
     // 0x00 ! > 0x01
-    assert(chip_8_state->vRegister(15) == 0);
+    assert(chip_8_state->vRegister(15) == 1);
 }
 
 /**

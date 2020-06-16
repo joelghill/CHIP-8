@@ -19,7 +19,3 @@ make install
 chip-8 <rom name>
 ```
 Does not support high res roms.
-
-## Known Issues
-Games such as "Pong" or "Breakout" are not working due to a collision detection bug
-

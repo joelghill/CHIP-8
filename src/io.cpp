@@ -16,6 +16,7 @@
 using namespace std;
 
 // This is a new comment!!!
+// This is another one!!!
 vector<char>* ReadRom(string filename) {
     ifstream rom_file(filename, ios::in);
 

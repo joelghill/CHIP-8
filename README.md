@@ -19,3 +19,5 @@ make install
 chip-8 <rom name>
 ```
 Does not support high res roms.
+
+This is a comment to demo branches!
